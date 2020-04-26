@@ -1,155 +1,284 @@
-﻿//Traceutils assembly
+﻿/* ExpressProfiler (aka SqlExpress Profiler)
+   https://github.com/OleksiiKovalov/expressprofiler
+ * Copyright (C) Oleksii Kovalov
+ * Forked by Ingo Herbote
+ * https://github.com/w8tcha/expressprofiler
+ * 
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+
+ * https://www.apache.org/licenses/LICENSE-2.0
+
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+//Traceutils assembly
 //writen by Locky, 2009.
-using System;
-using System.Drawing;
-using System.Text;
 
 namespace ExpressProfiler
 {
+    using System;
+    using System.Drawing;
+    using System.Text;
+    using System.Windows.Forms;
+
     public class YukonLexer
     {
         public enum TokenKind
         {
-            tkComment, tkDatatype,
-            tkFunction, tkIdentifier, tkKey, tkNull, tkNumber, tkSpace, tkString, tkSymbol, tkUnknown, tkVariable, tkGreyKeyword, tkFuKeyword
+            tkComment,
+
+            tkDatatype,
+
+            tkFunction,
+
+            tkIdentifier,
+
+            tkKey,
+
+            tkNull,
+
+            tkNumber,
+
+            tkSpace,
+
+            tkString,
+
+            tkSymbol,
+
+            tkUnknown,
+
+            tkVariable,
+
+            tkGreyKeyword,
+
+            tkFuKeyword
         }
 
-        private enum SqlRange { rsUnknown, rsComment, rsString }
+        private enum SqlRange
+        {
+            rsUnknown,
+
+            rsComment,
+
+            rsString
+        }
+
         private readonly Sqltokens m_Tokens = new Sqltokens();
 
         const string IdentifierStr = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890_#$";
+
         private readonly char[] m_IdentifiersArray = IdentifierStr.ToCharArray();
+
         const string HexDigits = "1234567890abcdefABCDEF";
+
         const string NumberStr = "1234567890.-";
+
         private int m_StringLen;
+
         private int m_TokenPos;
-        private string m_Token = "";
-        private TokenKind m_TokenId;
+
         private string m_Line;
+
         private int m_Run;
 
-        private TokenKind TokenId
-        {
-            get { return m_TokenId; }
-        }
+        private TokenKind TokenId { get; set; }
 
-        private string Token { get { /*int len = m_Run - m_TokenPos; return m_Line.Substring(m_TokenPos, len);*/return m_Token; } }
+        private string Token { get; set; } = string.Empty;
+
         private SqlRange Range { get; set; }
 
         private char GetChar(int idx)
         {
-            return idx >= m_Line.Length ? '\x00' : m_Line[idx];
+            return idx >= this.m_Line.Length ? '\x00' : this.m_Line[idx];
         }
+
         public string StandardSql(string sql)
         {
-            StringBuilder result = new StringBuilder();
-            Line = sql;
-            while (TokenId != TokenKind.tkNull)
+            var result = new StringBuilder();
+            this.Line = sql;
+            while (this.TokenId != TokenKind.tkNull)
             {
-                switch (TokenId)
+                switch (this.TokenId)
                 {
                     case TokenKind.tkNumber:
-                    case TokenKind.tkString: result.Append("<??>"); break;
-                    default: result.Append(Token); break;
+                    case TokenKind.tkString:
+                        result.Append("<??>");
+                        break;
+                    default:
+                        result.Append(this.Token);
+                        break;
                 }
-                Next();
+
+                this.Next();
             }
+
             return result.ToString();
         }
-        public YukonLexer() { Array.Sort(m_IdentifiersArray); }
-        public void FillRichEdit(System. Windows.Forms.RichTextBox rich, string value)
+
+        public YukonLexer()
         {
+            Array.Sort(this.m_IdentifiersArray);
+        }
 
-            rich.Text = "";
-            Line = value;
+        public void FillRichEdit(RichTextBox rich, string value)
+        {
+            rich.Text = string.Empty;
+            this.Line = value;
 
-            RTFBuilder sb = new RTFBuilder { BackColor = rich.BackColor };
-            while (TokenId != TokenKind.tkNull)
+            var sb = new RTFBuilder { BackColor = rich.BackColor };
+            while (this.TokenId != TokenKind.tkNull)
             {
                 Color forecolor;
-                switch (TokenId)
+                switch (this.TokenId)
                 {
-                    case TokenKind.tkKey: forecolor = Color.Blue;
+                    case TokenKind.tkKey:
+                        forecolor = Color.Blue;
                         break;
-                    case TokenKind.tkFunction: forecolor = Color.Fuchsia; break;
-                    case TokenKind.tkGreyKeyword: forecolor = Color.Gray; break;
-                    case TokenKind.tkFuKeyword: forecolor = Color.Fuchsia; break;
-                    case TokenKind.tkDatatype: forecolor = Color.Blue; break;
-                    case TokenKind.tkNumber: forecolor = Color.Red; break;
-                    case TokenKind.tkString: forecolor = Color.Red; break;
-                    case TokenKind.tkComment: forecolor = Color.DarkGreen;
+                    case TokenKind.tkFunction:
+                        forecolor = Color.Fuchsia;
                         break;
-                    default: forecolor = Color.Black; break;
+                    case TokenKind.tkGreyKeyword:
+                        forecolor = Color.Gray;
+                        break;
+                    case TokenKind.tkFuKeyword:
+                        forecolor = Color.Fuchsia;
+                        break;
+                    case TokenKind.tkDatatype:
+                        forecolor = Color.Blue;
+                        break;
+                    case TokenKind.tkNumber:
+                        forecolor = Color.Red;
+                        break;
+                    case TokenKind.tkString:
+                        forecolor = Color.Red;
+                        break;
+                    case TokenKind.tkComment:
+                        forecolor = Color.DarkGreen;
+                        break;
+                    default:
+                        forecolor = Color.Black;
+                        break;
                 }
+
                 sb.ForeColor = forecolor;
-                if (Token == Environment.NewLine || Token == "\r" || Token == "\n")
+                if (this.Token == Environment.NewLine || this.Token == "\r" || this.Token == "\n")
                 {
                     sb.AppendLine();
                 }
                 else
                 {
-                    sb.Append(Token);
+                    sb.Append(this.Token);
                 }
-                Next();
+
+                this.Next();
             }
+
             rich.Rtf = sb.ToString();
         }
 
         private string Line
         {
-            set { Range = SqlRange.rsUnknown; m_Line = value; m_Run = 0; Next(); }
+            set
+            {
+                this.Range = SqlRange.rsUnknown;
+                this.m_Line = value;
+                this.m_Run = 0;
+                this.Next();
+            }
         }
-        private void NullProc() { m_TokenId = TokenKind.tkNull; }
-        // ReSharper disable InconsistentNaming
-        private void LFProc() { m_TokenId = TokenKind.tkSpace; m_Run++; }
-        private void CRProc() { m_TokenId = TokenKind.tkSpace; m_Run++; if (GetChar(m_Run) == '\x0A')m_Run++; }
-        // ReSharper restore InconsistentNaming
 
+        private void NullProc()
+        {
+            this.TokenId = TokenKind.tkNull;
+        }
+
+        // ReSharper disable InconsistentNaming
+        private void LFProc()
+        {
+            this.TokenId = TokenKind.tkSpace;
+            this.m_Run++;
+        }
+
+        private void CRProc()
+        {
+            this.TokenId = TokenKind.tkSpace;
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '\x0A') this.m_Run++;
+        }
+
+        // ReSharper restore InconsistentNaming
         private void AnsiCProc()
         {
-            switch (GetChar(m_Run))
+            switch (this.GetChar(this.m_Run))
             {
-                case '\x00': NullProc(); break;
-                case '\x0A': LFProc(); break;
-                case '\x0D': CRProc(); break;
+                case '\x00':
+                    this.NullProc();
+                    break;
+                case '\x0A':
+                    this.LFProc();
+                    break;
+                case '\x0D':
+                    this.CRProc();
+                    break;
 
                 default:
                     {
-                        m_TokenId = TokenKind.tkComment;
+                        this.TokenId = TokenKind.tkComment;
                         char c;
                         do
                         {
-                            if (GetChar(m_Run) == '*' && GetChar(m_Run + 1) == '/')
+                            if (this.GetChar(this.m_Run) == '*' && this.GetChar(this.m_Run + 1) == '/')
                             {
-                                Range = SqlRange.rsUnknown; m_Run += 2; break;
+                                this.Range = SqlRange.rsUnknown;
+                                this.m_Run += 2;
+                                break;
                             }
-                            m_Run++;
-                            c = GetChar(m_Run);
+
+                            this.m_Run++;
+                            c = this.GetChar(this.m_Run);
                         }
                         while (!(c == '\x00' || c == '\x0A' || c == '\x0D'));
+
                         break;
                     }
-
-
-
             }
         }
 
         private void AsciiCharProc()
         {
-            if (GetChar(m_Run) == '\x00') { NullProc(); }
+            if (this.GetChar(this.m_Run) == '\x00')
+            {
+                this.NullProc();
+            }
             else
             {
-                m_TokenId = TokenKind.tkString;
-                if (m_Run > 0 || Range != SqlRange.rsString || GetChar(m_Run) != '\x27')
+                this.TokenId = TokenKind.tkString;
+                if (this.m_Run > 0 || this.Range != SqlRange.rsString || this.GetChar(this.m_Run) != '\x27')
                 {
-                    Range = SqlRange.rsString;
+                    this.Range = SqlRange.rsString;
                     char c;
-                    do { m_Run++; c = GetChar(m_Run); } while (!(c == '\x00' || c == '\x0A' || c == '\x0D' || c == '\x27'));
-                    if (GetChar(m_Run) == '\x27')
+                    do
                     {
-                        m_Run++;
-                        Range = SqlRange.rsUnknown;
+                        this.m_Run++;
+                        c = this.GetChar(this.m_Run);
+                    }
+                    while (!(c == '\x00' || c == '\x0A' || c == '\x0D' || c == '\x27'));
+
+                    if (this.GetChar(this.m_Run) == '\x27')
+                    {
+                        this.m_Run++;
+                        this.Range = SqlRange.rsUnknown;
                     }
                 }
             }
@@ -159,26 +288,56 @@ namespace ExpressProfiler
         {
             switch (chr)
             {
-                case '\x00': NullProc(); break;
-                case '\x0A': LFProc(); break;
-                case '\x0D': CRProc(); break;
-                case '\x27': AsciiCharProc(); break;
+                case '\x00':
+                    this.NullProc();
+                    break;
+                case '\x0A':
+                    this.LFProc();
+                    break;
+                case '\x0D':
+                    this.CRProc();
+                    break;
+                case '\x27':
+                    this.AsciiCharProc();
+                    break;
 
-                case '=': EqualProc(); break;
-                case '>': GreaterProc(); break;
-                case '<': LowerProc(); break;
-                case '-': MinusProc(); break;
-                case '|': OrSymbolProc(); break;
-                case '+': PlusProc(); break;
-                case '/': SlashProc(); break;
-                case '&': AndSymbolProc(); break;
-                case '\x22': QuoteProc(); break;
+                case '=':
+                    this.EqualProc();
+                    break;
+                case '>':
+                    this.GreaterProc();
+                    break;
+                case '<':
+                    this.LowerProc();
+                    break;
+                case '-':
+                    this.MinusProc();
+                    break;
+                case '|':
+                    this.OrSymbolProc();
+                    break;
+                case '+':
+                    this.PlusProc();
+                    break;
+                case '/':
+                    this.SlashProc();
+                    break;
+                case '&':
+                    this.AndSymbolProc();
+                    break;
+                case '\x22':
+                    this.QuoteProc();
+                    break;
                 case ':':
-                case '@': VariableProc(); break;
+                case '@':
+                    this.VariableProc();
+                    break;
                 case '^':
                 case '%':
                 case '*':
-                case '!': SymbolAssignProc(); break;
+                case '!':
+                    this.SymbolAssignProc();
+                    break;
                 case '{':
                 case '}':
                 case '.':
@@ -188,226 +347,318 @@ namespace ExpressProfiler
                 case '(':
                 case ')':
                 case ']':
-                case '~': SymbolProc(); break;
-                case '[': BracketProc(); break;
+                case '~':
+                    this.SymbolProc();
+                    break;
+                case '[':
+                    this.BracketProc();
+                    break;
                 default:
-                    DoInsideProc(chr); break;
-
+                    this.DoInsideProc(chr);
+                    break;
             }
         }
 
         private void DoInsideProc(char chr)
         {
+            if (chr >= 'A' && chr <= 'Z' || chr >= 'a' && chr <= 'z' || chr == '_' || chr == '#')
+            {
+                this.IdentProc();
+                return;
+            }
 
-            if ((chr >= 'A' && chr <= 'Z') || (chr >= 'a' && chr <= 'z') || (chr == '_') || (chr == '#')) { IdentProc(); return; }
-            if (chr >= '0' && chr <= '9') { NumberProc(); return; }
-            if ((chr >= '\x00' && chr <= '\x09') || (chr >= '\x0B' && chr <= '\x0C') || (chr >= '\x0E' && chr <= '\x20')) { SpaceProc(); return; }
-            UnknownProc();
+            if (chr >= '0' && chr <= '9')
+            {
+                this.NumberProc();
+                return;
+            }
+
+            if (chr >= '\x00' && chr <= '\x09' || chr >= '\x0B' && chr <= '\x0C'
+                                               || chr >= '\x0E' && chr <= '\x20')
+            {
+                this.SpaceProc();
+                return;
+            }
+
+            this.UnknownProc();
         }
 
         private void SpaceProc()
         {
-            m_TokenId = TokenKind.tkSpace;
+            this.TokenId = TokenKind.tkSpace;
             char c;
-            do { m_Run++; c = GetChar(m_Run); }
+            do
+            {
+                this.m_Run++;
+                c = this.GetChar(this.m_Run);
+            }
             while (!(c > '\x20' || c == '\x00' || c == '\x0A' || c == '\x0D'));
         }
 
         private void UnknownProc()
         {
-            m_Run++;
-            m_TokenId = TokenKind.tkUnknown;
+            this.m_Run++;
+            this.TokenId = TokenKind.tkUnknown;
         }
 
         private void NumberProc()
         {
-            m_TokenId = TokenKind.tkNumber;
-            if (GetChar(m_Run) == '0' && (GetChar(m_Run+1) == 'X' || GetChar(m_Run+1) == 'x'))
+            this.TokenId = TokenKind.tkNumber;
+            if (this.GetChar(this.m_Run) == '0'
+                && (this.GetChar(this.m_Run + 1) == 'X' || this.GetChar(this.m_Run + 1) == 'x'))
             {
-                m_Run += 2;
-                while (HexDigits.IndexOf(GetChar(m_Run)) != -1) m_Run++;
+                this.m_Run += 2;
+                while (HexDigits.IndexOf(this.GetChar(this.m_Run)) != -1) this.m_Run++;
                 return;
             }
-            m_Run++;
-            m_TokenId = TokenKind.tkNumber;
-            while (NumberStr.IndexOf(GetChar(m_Run)) != -1)
-            {
-                if (GetChar(m_Run) == '.' && GetChar(m_Run + 1) == '.') break;
-                m_Run++;
-            }
 
+            this.m_Run++;
+            this.TokenId = TokenKind.tkNumber;
+            while (NumberStr.IndexOf(this.GetChar(this.m_Run)) != -1)
+            {
+                if (this.GetChar(this.m_Run) == '.' && this.GetChar(this.m_Run + 1) == '.') break;
+                this.m_Run++;
+            }
         }
 
         private void QuoteProc()
         {
-            m_TokenId = TokenKind.tkIdentifier;
-            m_Run++;
-            while (!(GetChar(m_Run) == '\x00' || GetChar(m_Run) == '\x0A' || GetChar(m_Run) == '\x0D'))
+            this.TokenId = TokenKind.tkIdentifier;
+            this.m_Run++;
+            while (!(this.GetChar(this.m_Run) == '\x00' || this.GetChar(this.m_Run) == '\x0A'
+                                                        || this.GetChar(this.m_Run) == '\x0D'))
             {
-                if (GetChar(m_Run) == '\x22') { m_Run++; break; }
-                m_Run++;
+                if (this.GetChar(this.m_Run) == '\x22')
+                {
+                    this.m_Run++;
+                    break;
+                }
+
+                this.m_Run++;
             }
         }
 
         private void BracketProc()
         {
-
-            m_TokenId = TokenKind.tkIdentifier;
-            m_Run++;
-            while (!(GetChar(m_Run) == '\x00' || GetChar(m_Run) == '\x0A' || GetChar(m_Run) == '\x0D'))
+            this.TokenId = TokenKind.tkIdentifier;
+            this.m_Run++;
+            while (!(this.GetChar(this.m_Run) == '\x00' || this.GetChar(this.m_Run) == '\x0A'
+                                                        || this.GetChar(this.m_Run) == '\x0D'))
             {
-                if (GetChar(m_Run) == ']') { m_Run++; break; }
-                m_Run++;
-            }
+                if (this.GetChar(this.m_Run) == ']')
+                {
+                    this.m_Run++;
+                    break;
+                }
 
+                this.m_Run++;
+            }
         }
 
         private void SymbolProc()
         {
-            m_Run++;
-            m_TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            this.TokenId = TokenKind.tkSymbol;
         }
 
         private void SymbolAssignProc()
         {
-            m_TokenId = TokenKind.tkSymbol;
-            m_Run++;
-            if (GetChar(m_Run) == '=') m_Run++;
+            this.TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=') this.m_Run++;
         }
 
         private void KeyHash(int pos)
         {
-            m_StringLen = 0;
-            while (Array.BinarySearch(m_IdentifiersArray, GetChar(pos)) >= 0) { m_StringLen++; pos++; }
+            this.m_StringLen = 0;
+            while (Array.BinarySearch(this.m_IdentifiersArray, this.GetChar(pos)) >= 0)
+            {
+                this.m_StringLen++;
+                pos++;
+            }
+
             return;
         }
+
         private TokenKind IdentKind()
         {
-            KeyHash(m_Run);
-            return m_Tokens[m_Line.Substring(m_TokenPos, m_Run + m_StringLen - m_TokenPos)];
+            this.KeyHash(this.m_Run);
+            return this.m_Tokens[
+                this.m_Line.Substring(this.m_TokenPos, this.m_Run + this.m_StringLen - this.m_TokenPos)];
         }
+
         private void IdentProc()
         {
-            m_TokenId = IdentKind();
-            m_Run += m_StringLen;
-            if (m_TokenId == TokenKind.tkComment)
+            this.TokenId = this.IdentKind();
+            this.m_Run += this.m_StringLen;
+            if (this.TokenId == TokenKind.tkComment)
             {
-                while (!(GetChar(m_Run) == '\x00' || GetChar(m_Run) == '\x0A' || GetChar(m_Run) == '\x0D')) { m_Run++; }
+                while (!(this.GetChar(this.m_Run) == '\x00' || this.GetChar(this.m_Run) == '\x0A'
+                                                            || this.GetChar(this.m_Run) == '\x0D'))
+                {
+                    this.m_Run++;
+                }
             }
             else
             {
-                while (IdentifierStr.IndexOf(GetChar(m_Run)) != -1) m_Run++;
+                while (IdentifierStr.IndexOf(this.GetChar(this.m_Run)) != -1) this.m_Run++;
             }
         }
+
         private void VariableProc()
         {
-            if (GetChar(m_Run) == '@' && GetChar(m_Run + 1) == '@') { m_Run += 2; IdentProc(); }
+            if (this.GetChar(this.m_Run) == '@' && this.GetChar(this.m_Run + 1) == '@')
+            {
+                this.m_Run += 2;
+                this.IdentProc();
+            }
             else
             {
-                m_TokenId = TokenKind.tkVariable;
-                int i = m_Run;
-                do { i++; } while (!(IdentifierStr.IndexOf(GetChar(i)) == -1));
-                m_Run = i;
+                this.TokenId = TokenKind.tkVariable;
+                var i = this.m_Run;
+                do
+                {
+                    i++;
+                }
+                while (IdentifierStr.IndexOf(this.GetChar(i)) != -1);
+
+                this.m_Run = i;
             }
         }
 
         private void AndSymbolProc()
         {
-            m_TokenId = TokenKind.tkSymbol;
-            m_Run++;
-            if (GetChar(m_Run) == '=' || GetChar(m_Run) == '&') m_Run++;
+            this.TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '&') this.m_Run++;
         }
 
         private void SlashProc()
         {
-            m_Run++;
-            switch (GetChar(m_Run))
+            this.m_Run++;
+            switch (this.GetChar(this.m_Run))
             {
                 case '*':
                     {
-                        Range = SqlRange.rsComment;
-                        m_TokenId = TokenKind.tkComment;
+                        this.Range = SqlRange.rsComment;
+                        this.TokenId = TokenKind.tkComment;
                         do
                         {
-                            m_Run++;
-                            if (GetChar(m_Run) == '*' && GetChar(m_Run + 1) == '/') { Range = SqlRange.rsUnknown; m_Run += 2; break; }
-                        } while (!(GetChar(m_Run) == '\x00' || GetChar(m_Run) == '\x0D' || GetChar(m_Run) == '\x0A'));
-                    }
-                    break;
-                case '=': m_Run++; m_TokenId = TokenKind.tkSymbol; break;
-                default: m_TokenId = TokenKind.tkSymbol; break;
+                            this.m_Run++;
+                            if (this.GetChar(this.m_Run) != '*' || this.GetChar(this.m_Run + 1) != '/')
+                            {
+                                continue;
+                            }
 
+                            this.Range = SqlRange.rsUnknown;
+                            this.m_Run += 2;
+                            break;
+                        }
+                        while (!(this.GetChar(this.m_Run) == '\x00' || this.GetChar(this.m_Run) == '\x0D'
+                                                                    || this.GetChar(this.m_Run) == '\x0A'));
+                    }
+
+                    break;
+                case '=':
+                    this.m_Run++;
+                    this.TokenId = TokenKind.tkSymbol;
+                    break;
+                default:
+                    this.TokenId = TokenKind.tkSymbol;
+                    break;
             }
         }
 
         private void PlusProc()
         {
-            m_TokenId = TokenKind.tkSymbol;
-            m_Run++;
-            if (GetChar(m_Run) == '=' || GetChar(m_Run) == '=') m_Run++;
-
+            this.TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '=') this.m_Run++;
         }
 
         private void OrSymbolProc()
         {
-            m_TokenId = TokenKind.tkSymbol;
-            m_Run++;
-            if (GetChar(m_Run) == '=' || GetChar(m_Run) == '|') m_Run++;
+            this.TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '|') this.m_Run++;
         }
 
         private void MinusProc()
         {
-            m_Run++;
-            if (GetChar(m_Run) == '-')
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '-')
             {
-                m_TokenId = TokenKind.tkComment;
+                this.TokenId = TokenKind.tkComment;
                 char c;
                 do
                 {
-                    m_Run++;
-                    c = GetChar(m_Run);
-                } while (!(c == '\x00' || c == '\x0A' || c == '\x0D'));
+                    this.m_Run++;
+                    c = this.GetChar(this.m_Run);
+                }
+                while (!(c == '\x00' || c == '\x0A' || c == '\x0D'));
             }
-            else { m_TokenId = TokenKind.tkSymbol; }
+            else
+            {
+                this.TokenId = TokenKind.tkSymbol;
+            }
         }
 
         private void LowerProc()
         {
-            m_TokenId = TokenKind.tkSymbol;
-            m_Run++;
-            switch (GetChar(m_Run))
+            this.TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            switch (this.GetChar(this.m_Run))
             {
-                case '=': m_Run++; break;
-                case '<': m_Run++; if (GetChar(m_Run) == '=') m_Run++; break;
+                case '=':
+                    this.m_Run++;
+                    break;
+                case '<':
+                    this.m_Run++;
+                    if (this.GetChar(this.m_Run) == '=')
+                    {
+                        this.m_Run++;
+                    }
+                    break;
             }
-
         }
 
         private void GreaterProc()
         {
-            m_TokenId = TokenKind.tkSymbol;
-            m_Run++;
-            if (GetChar(m_Run) == '=' || GetChar(m_Run) == '>') m_Run++;
+            this.TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '>')
+            {
+                this.m_Run++;
+            }
         }
 
         private void EqualProc()
         {
-            m_TokenId = TokenKind.tkSymbol;
-            m_Run++;
-            if (GetChar(m_Run) == '=' || GetChar(m_Run) == '>') m_Run++;
+            this.TokenId = TokenKind.tkSymbol;
+            this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '>')
+            {
+                this.m_Run++;
+            }
         }
 
         private void Next()
         {
-            m_TokenPos = m_Run;
-            switch (Range)
+            this.m_TokenPos = this.m_Run;
+            switch (this.Range)
             {
-                case SqlRange.rsComment: AnsiCProc(); break;
-                case SqlRange.rsString: AsciiCharProc(); break;
-                default: DoProcTable(GetChar(m_Run)); break;
+                case SqlRange.rsComment:
+                    this.AnsiCProc();
+                    break;
+                case SqlRange.rsString:
+                    this.AsciiCharProc();
+                    break;
+                default:
+                    this.DoProcTable(this.GetChar(this.m_Run));
+                    break;
             }
-            m_Token = m_Line.Substring(m_TokenPos, m_Run - m_TokenPos);
-        }
 
+            this.Token = this.m_Line.Substring(this.m_TokenPos, this.m_Run - this.m_TokenPos);
+        }
     }
 }
