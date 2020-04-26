@@ -88,33 +88,33 @@ namespace ExpressProfiler.Comparer
                     listviewY.SubItems[this.SortColumn].Text);
             }
 
-            switch (this.Order)
+            return this.Order switch
             {
                 // Calculate correct return value based on object comparison
-                case SortOrder.Ascending:
-                    // Ascending sort is selected,
-                    // return normal result of compare operation
-                    return compareResult;
-                case SortOrder.Descending:
-                    // Descending sort is selected,
-                    // return negative result of compare operation
-                    return -compareResult;
-                default:
-                    // Return '0' to indicate they are equal
-                    return 0;
-            }
+                SortOrder.Ascending =>
+
+                // Ascending sort is selected,
+                // return normal result of compare operation
+                compareResult,
+                SortOrder.Descending =>
+
+                // Descending sort is selected,
+                // return negative result of compare operation
+                -compareResult,
+                _ => 0
+            };
         }
 
         /// <summary>
         /// Gets or sets the number of the column to which
         /// to apply the sorting operation (Defaults to '0').
         /// </summary>
-        private int SortColumn { get; set; }
+        private int SortColumn { get; }
 
         /// <summary>
         /// Gets or sets the order of sorting to apply
         /// (for example, 'Ascending' or 'Descending').
         /// </summary>
-        private SortOrder Order { get; set; }
+        private SortOrder Order { get; }
     }
 }

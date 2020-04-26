@@ -9,10 +9,14 @@
 //------------------------------------------------------------------------------
 
 namespace ExpressProfiler.Properties {
-    using System;
+    using System.CodeDom.Compiler;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Globalization;
     using System.Resources;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
@@ -22,18 +26,18 @@ namespace ExpressProfiler.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute(
+    [GeneratedCode(
         "System.Resources.Tools.StronglyTypedResourceBuilder",
         "16.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [DebuggerNonUserCode()]
+    [CompilerGenerated()]
     internal class Resources
     {
         private static ResourceManager resourceMan;
 
         private static CultureInfo resourceCulture;
 
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        [SuppressMessage(
             "Microsoft.Performance",
             "CA1811:AvoidUncalledPrivateCode")]
         internal Resources()
@@ -43,15 +47,15 @@ namespace ExpressProfiler.Properties {
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(
-            global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        [EditorBrowsable(
+            EditorBrowsableState.Advanced)]
         internal static ResourceManager ResourceManager
         {
             get
             {
-                if (object.ReferenceEquals(resourceMan, null))
+                if (ReferenceEquals(resourceMan, null))
                 {
-                    ResourceManager temp = new global::System.Resources.ResourceManager(
+                    ResourceManager temp = new ResourceManager(
                         "ExpressProfiler.Properties.Resources",
                         typeof(Resources).Assembly);
                     resourceMan = temp;
@@ -65,8 +69,8 @@ namespace ExpressProfiler.Properties {
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(
-            global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        [EditorBrowsable(
+            EditorBrowsableState.Advanced)]
         internal static CultureInfo Culture
         {
             get
@@ -88,7 +92,7 @@ namespace ExpressProfiler.Properties {
             get
             {
                 object obj = ResourceManager.GetObject("Application", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                return ((Icon)(obj));
             }
         }
 
@@ -100,7 +104,7 @@ namespace ExpressProfiler.Properties {
             get
             {
                 object obj = ResourceManager.GetObject("filter", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((Bitmap)(obj));
             }
         }
 
@@ -112,7 +116,7 @@ namespace ExpressProfiler.Properties {
             get
             {
                 object obj = ResourceManager.GetObject("imClear", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((Bitmap)(obj));
             }
         }
 
@@ -124,7 +128,7 @@ namespace ExpressProfiler.Properties {
             get
             {
                 object obj = ResourceManager.GetObject("imPause", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((Bitmap)(obj));
             }
         }
 
@@ -136,7 +140,7 @@ namespace ExpressProfiler.Properties {
             get
             {
                 object obj = ResourceManager.GetObject("imScroll", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((Bitmap)(obj));
             }
         }
 
@@ -148,7 +152,7 @@ namespace ExpressProfiler.Properties {
             get
             {
                 object obj = ResourceManager.GetObject("imStart", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((Bitmap)(obj));
             }
         }
 
@@ -160,7 +164,7 @@ namespace ExpressProfiler.Properties {
             get
             {
                 object obj = ResourceManager.GetObject("imStop", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((Bitmap)(obj));
             }
         }
     }

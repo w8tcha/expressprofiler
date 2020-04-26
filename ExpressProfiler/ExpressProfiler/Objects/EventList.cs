@@ -78,8 +78,6 @@ namespace ExpressProfiler.Objects
         [XmlAttribute]
         public long NestLevel;
 
-        // needed for serialization
-        // ReSharper disable UnusedMember.Global
         /// <summary>
         /// Initializes a new instance of the <see cref="CEvent"/> class.
         /// </summary>

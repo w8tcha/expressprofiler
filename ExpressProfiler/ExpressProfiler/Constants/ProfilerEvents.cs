@@ -24,9 +24,11 @@
 
 namespace ExpressProfiler.Constants
 {
+    /// <summary>
+    /// The profiler events.
+    /// </summary>
     public static class ProfilerEvents
     {
-
         /*
         select 'public static class '+replace(name,' ','')+'
         {

@@ -66,7 +66,6 @@ namespace ExpressProfiler
 
         private void edPattern_TextChanged(object sender, EventArgs e)
         {
-            this.m_mainForm.lastpos = -1;
         }
     }
 }

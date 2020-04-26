@@ -29,6 +29,9 @@ namespace ExpressProfiler.Constants
     /// </summary>
     public static class ProfilerEventColumns
     {
+        /// <summary>
+        /// The column names.
+        /// </summary>
         public static readonly string[] ColumnNames =
             {
                 "Dumy", "TextData", "BinaryData", "DatabaseID", "TransactionID", "LineNumber", "NTUserName",
@@ -42,6 +45,9 @@ namespace ExpressProfiler.Constants
                 "ParentName", "IsSystem", "Offset", "SourceDatabaseID", "SqlHandle", "SessionLoginName", "PlanHandle"
             };
 
+        /// <summary>
+        /// The profiler column data types.
+        /// </summary>
         public static readonly ProfilerColumnDataType[] ProfilerColumnDataTypes =
         {
             /*dummy*/ ProfilerColumnDataType.String

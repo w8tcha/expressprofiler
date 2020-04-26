@@ -32,31 +32,48 @@ namespace ExpressProfiler.Comparer
     /// </summary>
     public class ImageTextComparer : IComparer
     {
-        // private CaseInsensitiveComparer ObjectCompare;
-        private NumberCaseInsensitiveComparer ObjectCompare;
+        /// <summary>
+        /// The object compare.
+        /// </summary>
+        private readonly NumberCaseInsensitiveComparer objectCompare;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageTextComparer"/> class.
+        /// </summary>
         public ImageTextComparer()
         {
             // Initialize the CaseInsensitiveComparer object
-            this.ObjectCompare = new NumberCaseInsensitiveComparer();
+            this.objectCompare = new NumberCaseInsensitiveComparer();
         }
 
+        /// <summary>
+        /// The compare.
+        /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         public int Compare(object x, object y)
         {
             // int compareResult;
 
             // Cast the objects to be compared to ListViewItem objects
-            var listviewX = (ListViewItem)x;
-            var image1 = listviewX.ImageIndex;
-            var listviewY = (ListViewItem)y;
-            var image2 = listviewY.ImageIndex;
+            var listViewX = (ListViewItem)x;
+            var image1 = listViewX.ImageIndex;
+            var listViewY = (ListViewItem)y;
+            var image2 = listViewY.ImageIndex;
             
             if (image1 < image2)
             {
                 return -1;
             }
 
-            return image1 == image2 ? this.ObjectCompare.Compare(listviewX.Text, listviewY.Text) : 1;
+            return image1 == image2 ? this.objectCompare.Compare(listViewX.Text, listViewY.Text) : 1;
         }
     }
 }

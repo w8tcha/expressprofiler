@@ -23,7 +23,7 @@
  */
 
 //Traceutils assembly
-//writen by Locky, 2009.
+//written by Locky, 2009.
 
 namespace ExpressProfiler
 {
@@ -139,37 +139,18 @@ namespace ExpressProfiler
             var sb = new RTFBuilder { BackColor = rich.BackColor };
             while (this.TokenId != TokenKind.tkNull)
             {
-                Color forecolor;
-                switch (this.TokenId)
+                var forecolor = this.TokenId switch
                 {
-                    case TokenKind.tkKey:
-                        forecolor = Color.Blue;
-                        break;
-                    case TokenKind.tkFunction:
-                        forecolor = Color.Fuchsia;
-                        break;
-                    case TokenKind.tkGreyKeyword:
-                        forecolor = Color.Gray;
-                        break;
-                    case TokenKind.tkFuKeyword:
-                        forecolor = Color.Fuchsia;
-                        break;
-                    case TokenKind.tkDatatype:
-                        forecolor = Color.Blue;
-                        break;
-                    case TokenKind.tkNumber:
-                        forecolor = Color.Red;
-                        break;
-                    case TokenKind.tkString:
-                        forecolor = Color.Red;
-                        break;
-                    case TokenKind.tkComment:
-                        forecolor = Color.DarkGreen;
-                        break;
-                    default:
-                        forecolor = Color.Black;
-                        break;
-                }
+                    TokenKind.tkKey => Color.Blue,
+                    TokenKind.tkFunction => Color.Fuchsia,
+                    TokenKind.tkGreyKeyword => Color.Gray,
+                    TokenKind.tkFuKeyword => Color.Fuchsia,
+                    TokenKind.tkDatatype => Color.Blue,
+                    TokenKind.tkNumber => Color.Red,
+                    TokenKind.tkString => Color.Red,
+                    TokenKind.tkComment => Color.DarkGreen,
+                    _ => Color.Black
+                };
 
                 sb.ForeColor = forecolor;
                 if (this.Token == Environment.NewLine || this.Token == "\r" || this.Token == "\n")
@@ -214,7 +195,10 @@ namespace ExpressProfiler
         {
             this.TokenId = TokenKind.tkSpace;
             this.m_Run++;
-            if (this.GetChar(this.m_Run) == '\x0A') this.m_Run++;
+            if (this.GetChar(this.m_Run) == '\x0A')
+            {
+                this.m_Run++;
+            }
         }
 
         // ReSharper restore InconsistentNaming
@@ -264,23 +248,27 @@ namespace ExpressProfiler
             else
             {
                 this.TokenId = TokenKind.tkString;
-                if (this.m_Run > 0 || this.Range != SqlRange.rsString || this.GetChar(this.m_Run) != '\x27')
+                if (this.m_Run <= 0 && this.Range == SqlRange.rsString && this.GetChar(this.m_Run) == '\x27')
                 {
-                    this.Range = SqlRange.rsString;
-                    char c;
-                    do
-                    {
-                        this.m_Run++;
-                        c = this.GetChar(this.m_Run);
-                    }
-                    while (!(c == '\x00' || c == '\x0A' || c == '\x0D' || c == '\x27'));
-
-                    if (this.GetChar(this.m_Run) == '\x27')
-                    {
-                        this.m_Run++;
-                        this.Range = SqlRange.rsUnknown;
-                    }
+                    return;
                 }
+
+                this.Range = SqlRange.rsString;
+                char c;
+                do
+                {
+                    this.m_Run++;
+                    c = this.GetChar(this.m_Run);
+                }
+                while (!(c == '\x00' || c == '\x0A' || c == '\x0D' || c == '\x27'));
+
+                if (this.GetChar(this.m_Run) != '\x27')
+                {
+                    return;
+                }
+
+                this.m_Run++;
+                this.Range = SqlRange.rsUnknown;
             }
         }
 
@@ -373,8 +361,8 @@ namespace ExpressProfiler
                 return;
             }
 
-            if (chr >= '\x00' && chr <= '\x09' || chr >= '\x0B' && chr <= '\x0C'
-                                               || chr >= '\x0E' && chr <= '\x20')
+            if (chr <= '\x09' || chr >= '\x0B' && chr <= '\x0C'
+                              || chr >= '\x0E' && chr <= '\x20')
             {
                 this.SpaceProc();
                 return;
@@ -408,7 +396,11 @@ namespace ExpressProfiler
                 && (this.GetChar(this.m_Run + 1) == 'X' || this.GetChar(this.m_Run + 1) == 'x'))
             {
                 this.m_Run += 2;
-                while (HexDigits.IndexOf(this.GetChar(this.m_Run)) != -1) this.m_Run++;
+                while (HexDigits.IndexOf(this.GetChar(this.m_Run)) != -1)
+                {
+                    this.m_Run++;
+                }
+
                 return;
             }
 
@@ -416,7 +408,11 @@ namespace ExpressProfiler
             this.TokenId = TokenKind.tkNumber;
             while (NumberStr.IndexOf(this.GetChar(this.m_Run)) != -1)
             {
-                if (this.GetChar(this.m_Run) == '.' && this.GetChar(this.m_Run + 1) == '.') break;
+                if (this.GetChar(this.m_Run) == '.' && this.GetChar(this.m_Run + 1) == '.')
+                {
+                    break;
+                }
+
                 this.m_Run++;
             }
         }
@@ -465,7 +461,10 @@ namespace ExpressProfiler
         {
             this.TokenId = TokenKind.tkSymbol;
             this.m_Run++;
-            if (this.GetChar(this.m_Run) == '=') this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=')
+            {
+                this.m_Run++;
+            }
         }
 
         private void KeyHash(int pos)
@@ -476,8 +475,6 @@ namespace ExpressProfiler
                 this.m_StringLen++;
                 pos++;
             }
-
-            return;
         }
 
         private TokenKind IdentKind()
@@ -501,7 +498,10 @@ namespace ExpressProfiler
             }
             else
             {
-                while (IdentifierStr.IndexOf(this.GetChar(this.m_Run)) != -1) this.m_Run++;
+                while (IdentifierStr.IndexOf(this.GetChar(this.m_Run)) != -1)
+                {
+                    this.m_Run++;
+                }
             }
         }
 
@@ -573,14 +573,20 @@ namespace ExpressProfiler
         {
             this.TokenId = TokenKind.tkSymbol;
             this.m_Run++;
-            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '=') this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '=')
+            {
+                this.m_Run++;
+            }
         }
 
         private void OrSymbolProc()
         {
             this.TokenId = TokenKind.tkSymbol;
             this.m_Run++;
-            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '|') this.m_Run++;
+            if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '|')
+            {
+                this.m_Run++;
+            }
         }
 
         private void MinusProc()
@@ -618,6 +624,7 @@ namespace ExpressProfiler
                     {
                         this.m_Run++;
                     }
+
                     break;
             }
         }

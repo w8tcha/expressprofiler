@@ -27,23 +27,65 @@ namespace ExpressProfiler.Comparer
     using System.Collections.Generic;
     using System.Windows.Forms;
 
+    /// <summary>
+    /// The text data comparer.
+    /// </summary>
     public class TextDataComparer : IComparer<ListViewItem>
     {
-        private int CheckedColumn { get; set; }
-
-        private SortOrder SortOrder { get; set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TextDataComparer"/> class.
+        /// </summary>
+        /// <param name="checkedColumn">
+        /// The checked column.
+        /// </param>
+        /// <param name="sortOrder">
+        /// The sort order.
+        /// </param>
         public TextDataComparer(int checkedColumn, SortOrder sortOrder)
         {
             this.CheckedColumn = checkedColumn;
             this.SortOrder = sortOrder;
         }
+        
+        /// <summary>
+         /// Gets the checked column.
+         /// </summary>
+        private int CheckedColumn { get; }
 
+        /// <summary>
+        /// Gets the sort order.
+        /// </summary>
+        private SortOrder SortOrder { get; }
+
+        /// <summary>
+        /// The compare.
+        /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         public int Compare(ListViewItem x, ListViewItem y)
         {
             return this.SortOrder == SortOrder.Descending ? this.CompareDescending(x, y) : this.CompareAscending(x, y);
         }
 
+        /// <summary>
+        /// The compare ascending.
+        /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         private int CompareAscending(ListViewItem x, ListViewItem y)
         {
             switch (x.SubItems[this.CheckedColumn])
@@ -84,6 +126,18 @@ namespace ExpressProfiler.Comparer
             }
         }
 
+        /// <summary>
+        /// The compare descending.
+        /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         private int CompareDescending(ListViewItem x, ListViewItem y)
         {
             switch (x.SubItems[this.CheckedColumn])
@@ -112,7 +166,6 @@ namespace ExpressProfiler.Comparer
                             return string.CompareOrdinal(
                                 y.SubItems[this.CheckedColumn].Text,
                                 x.SubItems[this.CheckedColumn].Text);
-
                         }
 
                         if (xAsInt > yAsInt)
@@ -121,7 +174,6 @@ namespace ExpressProfiler.Comparer
                         }
 
                         return xAsInt < yAsInt ? 1 : 0;
-
                     }
             }
         }

@@ -59,7 +59,7 @@
             using (var memoryStream = new MemoryStream())
             {
                 var xs = new XmlSerializer(serializationType);
-                using (var xmlTextWriter = XmlWriter.Create(memoryStream, new XmlWriterSettings() { Encoding = utf8NoBom }))
+                using (var xmlTextWriter = XmlWriter.Create(memoryStream, new XmlWriterSettings { Encoding = utf8NoBom }))
                 {
                     xs.Serialize(xmlTextWriter, objectToSerialize, ns);
 
@@ -80,23 +80,19 @@
         /// <param name="content">
         /// The content.
         /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// </exception>
-        /// <exception cref="DirectoryNotFoundException">
-        /// </exception>
         public static void WriteXml(string folderPath, string fileName, string content)
         {
             if (fileName == null)
             {
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             if (!Directory.Exists(folderPath))
             {
-                throw new DirectoryNotFoundException(string.Format("the directory '{0}' does not exists", folderPath));
+                throw new DirectoryNotFoundException($"the directory '{folderPath}' does not exists");
             }
 
-            var fullPath = System.IO.Path.Combine(folderPath, fileName);
+            var fullPath = Path.Combine(folderPath, fileName);
 
             if (File.Exists(fullPath))
             {

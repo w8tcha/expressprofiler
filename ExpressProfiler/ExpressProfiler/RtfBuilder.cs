@@ -68,7 +68,9 @@ namespace ExpressProfiler
             }
         }
 
-
+        /// <summary>
+        /// The m_ backcolor.
+        /// </summary>
         private Color m_Backcolor;
 
         public Color BackColor
@@ -88,8 +90,6 @@ namespace ExpressProfiler
                 this.m_Backcolor = value;
             }
         }
-
-
         public RTFBuilder()
         {
             this.ForeColor = Color.FromKnownColor(KnownColor.WindowText);
@@ -104,27 +104,29 @@ namespace ExpressProfiler
 
         public void Append(string value)
         {
-            if (!string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
             {
-                value = CheckChar(value);
-                if (value.IndexOf(Environment.NewLine) >= 0)
-                {
-                    var lines = value.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-                    foreach (var line in lines)
-                    {
-                        this.m_Sb.Append(line);
-                        this.m_Sb.Append("\\line ");
-                    }
-                }
-                else
-                {
-                    this.m_Sb.Append(value);
-                }
+                return;
+            }
 
+            value = CheckChar(value);
+
+            if (value.IndexOf(Environment.NewLine, StringComparison.Ordinal) >= 0)
+            {
+                var lines = value.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                foreach (var line in lines)
+                {
+                    this.m_Sb.Append(line);
+                    this.m_Sb.Append("\\line ");
+                }
+            }
+            else
+            {
+                this.m_Sb.Append(value);
             }
         }
 
-        private static readonly char[] Slashable = new[] { '{', '}', '\\' };
+        private static readonly char[] Slashable = { '{', '}', '\\' };
 
         private readonly float m_DefaultFontSize;
 
@@ -142,26 +144,27 @@ namespace ExpressProfiler
 
             var replaceuni = value.Any(t => t > 255);
 
-            if (replaceuni)
+            if (!replaceuni)
             {
-                var sb = new StringBuilder();
-                foreach (var t in value)
-                {
-                    if (t <= 255)
-                    {
-                        sb.Append(t);
-                    }
-                    else
-                    {
-                        sb.Append("\\u");
-                        sb.Append((int)t);
-                        sb.Append("?");
-                    }
-                }
-
-                value = sb.ToString();
+                return value;
             }
 
+            var sb = new StringBuilder();
+            foreach (var t in value)
+            {
+                if (t <= 255)
+                {
+                    sb.Append(t);
+                }
+                else
+                {
+                    sb.Append("\\u");
+                    sb.Append((int)t);
+                    sb.Append("?");
+                }
+            }
+
+            value = sb.ToString();
 
             return value;
         }
@@ -194,7 +197,7 @@ namespace ExpressProfiler
             result.Append("\\viewkind4\\uc1\\pard\\plain\\f0");
             result.AppendFormat("\\fs{0} ", this.m_DefaultFontSize);
             result.AppendLine();
-            result.Append(this.m_Sb.ToString());
+            result.Append(this.m_Sb);
             result.Append("}");
             return result.ToString();
         }

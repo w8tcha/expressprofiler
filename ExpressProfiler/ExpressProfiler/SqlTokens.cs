@@ -141,7 +141,11 @@ namespace ExpressProfiler
                 if (t == ',')
                 {
                     var s = curtoken.ToString().ToLower();
-                    if (!this.m_Words.ContainsKey(s)) this.m_Words.Add(s, tokenkind);
+                    if (!this.m_Words.ContainsKey(s))
+                    {
+                        this.m_Words.Add(s, tokenkind);
+                    }
+
                     curtoken = new StringBuilder();
                 }
                 else

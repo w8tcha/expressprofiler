@@ -17,13 +17,11 @@
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// </exception>
         public static string ReadAllText(string fileName)
         {
             if (fileName == null)
             {
-                throw new ArgumentNullException("fileName");
+                throw new ArgumentNullException(nameof(fileName));
             }
 
             using (var reader = new StreamReader(fileName))

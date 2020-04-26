@@ -33,6 +33,18 @@ namespace ExpressProfiler.Comparer
     /// </summary>
     public class NumberCaseInsensitiveComparer : CaseInsensitiveComparer
     {
+        /// <summary>
+        /// The compare.
+        /// </summary>
+        /// <param name="x">
+        /// The x.
+        /// </param>
+        /// <param name="y">
+        /// The y.
+        /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         public new int Compare(object x, object y)
         {
             // in case x,y are strings and actually number,
@@ -41,12 +53,19 @@ namespace ExpressProfiler.Comparer
             {
                 return base.Compare(Convert.ToInt32(x), Convert.ToInt32(y));
             }
-            else
-            {
-                return base.Compare(x, y);
-            }
+
+            return base.Compare(x, y);
         }
 
+        /// <summary>
+        /// The is whole number.
+        /// </summary>
+        /// <param name="strNumber">
+        /// The string number.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         private static bool IsWholeNumber(string strNumber)
         {
             // use a regular expression to find out if string is actually a number

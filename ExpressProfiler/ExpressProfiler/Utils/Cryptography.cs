@@ -49,6 +49,15 @@ namespace ExpressProfiler.Utils
         /// </summary>
         private const string VIKey = "@1B5c3D2e9F6g7H8";
 
+        /// <summary>
+        /// The encrypt.
+        /// </summary>
+        /// <param name="plainText">
+        /// The plain text.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public static string Encrypt(string plainText)
         {
             var plainTextBytes = Encoding.UTF8.GetBytes(plainText);

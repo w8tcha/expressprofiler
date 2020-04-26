@@ -26,6 +26,7 @@ namespace ExpressProfiler
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Windows.Forms;
 
     using ExpressProfiler.Objects;
@@ -36,12 +37,12 @@ namespace ExpressProfiler
     /// </summary>
     public partial class RecentConnectionsForm : Form
     {
-        private MainForm _mainForm;
+        private readonly MainForm _mainForm;
+
         private RecentConnection _recentConnection;
 
-        private bool connectionSelected;
-
-        public RecentConnectionsForm(MainForm form) : this()
+        public RecentConnectionsForm(MainForm form)
+            : this()
         {
             this._mainForm = form;
             this.LoadConnections();
@@ -53,18 +54,8 @@ namespace ExpressProfiler
             this.ConnectEvents();
         }
 
-        public bool ConnectionSelected
-        {
-            get
-            {
-                return this.connectionSelected;
-            }
+        public bool ConnectionSelected { get; private set; }
 
-            set
-            {
-                this.connectionSelected = value;
-            }
-        }
         private void ConnectEvents()
         {
             this.txtSearch.KeyUp += this.TxtSearch_KeyUp;
@@ -73,31 +64,35 @@ namespace ExpressProfiler
 
         private void ConvertUTCDateToLocalTime()
         {
-            if (this._recentConnection?.Connections != null)
-            {
-                this._recentConnection.Connections.ForEach(c => c.CreationDate = string.IsNullOrEmpty(c.CreationDate) ? string.Empty : DateTime.Parse(c.CreationDate).ToLocalTime().ToString());
-            }
+            this._recentConnection?.Connections?.ForEach(
+                c => c.CreationDate = string.IsNullOrEmpty(c.CreationDate)
+                    ? string.Empty
+                    : DateTime.Parse(c.CreationDate).ToLocalTime().ToString(CultureInfo.InvariantCulture));
         }
 
         private void DgvConnections_DoubleClick(object sender, EventArgs e)
         {
-            var dataGridView = sender as DataGridView;
-            if (dataGridView != null)
+            if (!(sender is DataGridView dataGridView))
             {
-                var currentRow = dataGridView.CurrentRow.DataBoundItem as Connection;
-                if (currentRow != null)
-                {
-                    this._mainForm.recent_servername = currentRow.DataSource;
-                    this._mainForm.recent__username = string.IsNullOrEmpty(currentRow.IntegratedSecurity) ? currentRow.UserId : string.Empty;
-                    this._mainForm.recent_userpassword = string.IsNullOrEmpty(currentRow.IntegratedSecurity) ? Cryptography.Decrypt(currentRow.Password) : string.Empty;
-                    this._mainForm.recent_auth = string.IsNullOrEmpty(currentRow.IntegratedSecurity) ? 1 : 0;
-                    this.ConnectionSelected = true;
-                    this.Close();
-                }
-                else
-                {
-                    this.ConnectionSelected = false;
-                }
+                return;
+            }
+
+            if (dataGridView.CurrentRow.DataBoundItem is Connection currentRow)
+            {
+                this._mainForm.recent_servername = currentRow.DataSource;
+                this._mainForm.recent__username = string.IsNullOrEmpty(currentRow.IntegratedSecurity)
+                    ? currentRow.UserId
+                    : string.Empty;
+                this._mainForm.recent_userpassword = string.IsNullOrEmpty(currentRow.IntegratedSecurity)
+                    ? Cryptography.Decrypt(currentRow.Password)
+                    : string.Empty;
+                this._mainForm.recent_auth = string.IsNullOrEmpty(currentRow.IntegratedSecurity) ? 1 : 0;
+                this.ConnectionSelected = true;
+                this.Close();
+            }
+            else
+            {
+                this.ConnectionSelected = false;
             }
         }
 
@@ -112,27 +107,40 @@ namespace ExpressProfiler
         {
             var items = new List<Connection>();
 
-            if (this._recentConnection?.Connections != null)
+            if (this._recentConnection?.Connections == null)
             {
-                foreach (var iter in this._recentConnection.Connections)
+                return items;
+            }
+
+            foreach (var iter in this._recentConnection.Connections)
+            {
+                if (iter.DataSource.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1 ||
+                    iter.UserId.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
                 {
-                    if (iter.DataSource.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1 ||
-                        iter.UserId.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) != -1)
-                    {
-                        items.Add(iter);
-                    }
+                    items.Add(iter);
                 }
             }
 
             return items;
         }
 
+        /// <summary>
+        /// The txt search_ key up.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
         private void TxtSearch_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter || this.txtSearch.Text.Length > 3)
             {
                 if (string.IsNullOrEmpty(this.txtSearch.Text.Trim()))
+                {
                     return;
+                }
 
                 this.connectionBindingSource.DataSource = this.SearchConnection(this.txtSearch.Text);
             }

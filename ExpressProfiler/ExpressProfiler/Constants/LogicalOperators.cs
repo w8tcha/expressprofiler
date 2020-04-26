@@ -24,10 +24,19 @@
 
 namespace ExpressProfiler.Constants
 {
+    /// <summary>
+    /// The logical operators.
+    /// </summary>
     public static class LogicalOperators
     {
+        /// <summary>
+        /// The and.
+        /// </summary>
         public const int AND = 0;
 
+        /// <summary>
+        /// The or.
+        /// </summary>
         public const int OR = 1;
     }
 }

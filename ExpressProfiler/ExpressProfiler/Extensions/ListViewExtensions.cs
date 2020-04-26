@@ -38,36 +38,42 @@ namespace ExpressProfiler.Extensions
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class ListViewExtensions
     {
+        /// <summary>
+        /// The hditem.
+        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
         public struct HDITEM
         {
+            /// <summary>
+            /// The mask.
+            /// </summary>
             public Mask mask;
 
-            public int cxy;
+            private readonly int cxy;
 
             [MarshalAs(UnmanagedType.LPTStr)]
-            public string pszText;
+            private readonly string pszText;
 
-            public IntPtr hbm;
+            private readonly IntPtr hbm;
 
-            public int cchTextMax;
+            private readonly int cchTextMax;
 
             public Format fmt;
 
-            public IntPtr lParam;
+            private readonly IntPtr lParam;
 
             // _WIN32_IE >= 0x0300 
-            public int iImage;
+            private readonly int iImage;
 
-            public int iOrder;
+            private readonly int iOrder;
 
             // _WIN32_IE >= 0x0500
-            public uint type;
+            private readonly uint type;
 
-            public IntPtr pvFilter;
+            private readonly IntPtr pvFilter;
 
             // _WIN32_WINNT >= 0x0600
-            public uint state;
+            private readonly uint state;
 
             [Flags]
             public enum Mask
@@ -84,21 +90,21 @@ namespace ExpressProfiler.Extensions
             }
         }
 
-        public const int LVM_FIRST = 0x1000;
+        private const int LVM_FIRST = 0x1000;
 
-        public const int LVM_GETHEADER = LVM_FIRST + 31;
+        private const int LVM_GETHEADER = LVM_FIRST + 31;
 
-        public const int HDM_FIRST = 0x1200;
+        private const int HDM_FIRST = 0x1200;
 
-        public const int HDM_GETITEM = HDM_FIRST + 11;
+        private const int HDM_GETITEM = HDM_FIRST + 11;
 
-        public const int HDM_SETITEM = HDM_FIRST + 12;
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        private const int HDM_SETITEM = HDM_FIRST + 12;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, ref HDITEM lParam);
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, ref HDITEM lParam);
 
         public static void SetSortIcon(this ListView listViewControl, int columnIndex, SortOrder order)
         {

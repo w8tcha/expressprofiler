@@ -28,6 +28,7 @@
 namespace ExpressProfiler
 {
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
     using System.Data.SqlClient;
@@ -112,7 +113,11 @@ order by Type_Name,trace_column_id
 
         private string GetString(int idx)
         {
-            if (!this.ColumnIsSet(idx)) return string.Empty;
+            if (!this.ColumnIsSet(idx))
+            {
+                return string.Empty;
+            }
+
             return this.m_Events[idx] == null ? string.Empty : (string)this.m_Events[idx];
         }
 
@@ -313,7 +318,10 @@ order by trace_column_id
 
         private readonly SqlConnection m_Conn;
 
-        public int TraceId { get; private set; }
+        /// <summary>
+        /// Gets the trace id.
+        /// </summary>
+        private int TraceId { get; set; }
 
         readonly SetEventDelegate[] m_Delegates = new SetEventDelegate[66];
 
@@ -327,10 +335,7 @@ order by trace_column_id
 
         public void Close()
         {
-            if (this.m_Reader != null)
-            {
-                this.m_Reader.Close();
-            }
+            this.m_Reader?.Close();
 
             this.TraceIsActive = false;
         }
@@ -482,19 +487,19 @@ order by trace_column_id
             evt.m_ColumnMask |= 1UL << columnid;
         }
 
-        private static long ToInt64(byte[] value)
+        private static long ToInt64(IReadOnlyList<byte> value)
         {
             var i1 = value[0] | (value[1] << 8) | (value[2] << 16) | (value[3] << 24);
             var i2 = value[4] | (value[5] << 8) | (value[6] << 16) | (value[7] << 24);
             return (uint)i1 | ((long)i2 << 32);
         }
 
-        private static int ToInt32(byte[] value)
+        private static int ToInt32(IReadOnlyList<byte> value)
         {
             return value[0] | (value[1] << 8) | (value[2] << 16) | (value[3] << 24);
         }
 
-        private static int ToInt16(byte[] value)
+        private static int ToInt16(IReadOnlyList<byte> value)
         {
             return value[0] | (value[1] << 8);
         }
@@ -691,7 +696,11 @@ order by trace_column_id
 
         public ProfilerEvent Next()
         {
-            if (!this.TraceIsActive) return null;
+            if (!this.TraceIsActive)
+            {
+                return null;
+            }
+
             var columnid = (int)this.m_Reader[0];
 
             // skip to begin of new event
@@ -701,8 +710,15 @@ order by trace_column_id
             }
 
             // start of new event
-            if (columnid != 65526) return null;
-            if (!this.TraceIsActive) return null;
+            if (columnid != 65526)
+            {
+                return null;
+            }
+
+            if (!this.TraceIsActive)
+            {
+                return null;
+            }
 
             // get potential event class
             this.m_Reader.GetBytes(2, 0, this.m_B2, 0, 2);
@@ -717,7 +733,11 @@ order by trace_column_id
                 while (this.Read())
                 {
                     columnid = (int)this.m_Reader[0];
-                    if (columnid > 64) return evt;
+                    if (columnid > 64)
+                    {
+                        return evt;
+                    }
+
                     this.m_Delegates[columnid](evt, columnid);
                 }
             }

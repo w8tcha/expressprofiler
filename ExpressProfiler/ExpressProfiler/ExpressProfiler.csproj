@@ -50,6 +50,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>if /I "$(ConfigurationName)" == "Release" if exist "$(SolutionDir)\ExpressProfiler\sign.bat" "$(SolutionDir)\ExpressProfiler\sign.bat" "$(TargetPath)"</PostBuildEvent>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Deployment" />

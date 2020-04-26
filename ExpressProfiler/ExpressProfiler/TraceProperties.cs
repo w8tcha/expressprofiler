@@ -30,6 +30,8 @@ namespace ExpressProfiler
     using System.Windows.Forms;
     using System.Xml.Serialization;
 
+    using ExpressProfiler.Properties;
+
     public partial class TraceProperties : Form
     {
         public enum StringFilterCondition
@@ -436,8 +438,8 @@ namespace ExpressProfiler
 
         private void btnSaveAsDefault_Click(object sender, EventArgs e)
         {
-            Properties.Settings.Default.TraceSettings = this.m_currentsettings.GetAsXmlString();
-            Properties.Settings.Default.Save();
+            Settings.Default.TraceSettings = this.m_currentsettings.GetAsXmlString();
+            Settings.Default.Save();
         }
 
         internal static bool AtLeastOneEventSelected(TraceSettings ts)
@@ -471,35 +473,35 @@ namespace ExpressProfiler
             var included = true;
 
             // Fragile here to hard coding the columns, but they are currently this way.
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.ApplicationNameFilterCondition,
                 this.m_currentsettings.Filters.ApplicationName,
                 lvi.SubItems[0].Text);
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.TextDataFilterCondition,
                 this.m_currentsettings.Filters.TextData,
                 lvi.SubItems[1].Text);
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.LoginNameFilterCondition,
                 this.m_currentsettings.Filters.LoginName,
                 lvi.SubItems[2].Text);
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.CpuFilterCondition,
                 this.m_currentsettings.Filters.CPU,
                 lvi.SubItems[3].Text);
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.ReadsFilterCondition,
                 this.m_currentsettings.Filters.Reads,
                 lvi.SubItems[4].Text);
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.WritesFilterCondition,
                 this.m_currentsettings.Filters.Writes,
                 lvi.SubItems[5].Text);
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.DurationFilterCondition,
                 this.m_currentsettings.Filters.Duration,
                 lvi.SubItems[6].Text);
-            included &= this.IsIncluded(
+            included &= IsIncluded(
                 this.m_currentsettings.Filters.SPIDFilterCondition,
                 this.m_currentsettings.Filters.SPID,
                 lvi.SubItems[7].Text);
@@ -507,37 +509,78 @@ namespace ExpressProfiler
             return included;
         }
 
-        private bool IsIncluded(StringFilterCondition filterCondition, string filter, string entryToCheck)
+        /// <summary>
+        /// The is included.
+        /// </summary>
+        /// <param name="filterCondition">
+        /// The filter condition.
+        /// </param>
+        /// <param name="filter">
+        /// The filter.
+        /// </param>
+        /// <param name="entryToCheck">
+        /// The entry to check.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        private static bool IsIncluded(StringFilterCondition filterCondition, string filter, string entryToCheck)
         {
             var included = true; // Until removed.  Negative logic is applied here.
-            if (string.IsNullOrEmpty(filter) == false)
+            
+            if (string.IsNullOrEmpty(filter))
             {
-                if (filterCondition == StringFilterCondition.Like)
+                return true;
+            }
+
+            switch (filterCondition)
+            {
+                case StringFilterCondition.Like:
                 {
                     if (entryToCheck.Contains(filter) == false)
                     {
                         included = false;
                     }
+
+                    break;
                 }
-                else if (filterCondition == StringFilterCondition.NotLike)
+
+                case StringFilterCondition.NotLike:
                 {
                     if (entryToCheck.Contains(filter))
                     {
                         included = false;
                     }
+
+                    break;
                 }
             }
 
             return included;
         }
 
-        private bool IsIncluded(IntFilterCondition filterCondition, int? filter, string entryToCheck)
+        /// <summary>
+        /// The is included.
+        /// </summary>
+        /// <param name="filterCondition">
+        /// The filter condition.
+        /// </param>
+        /// <param name="filter">
+        /// The filter.
+        /// </param>
+        /// <param name="entryToCheck">
+        /// The entry to check.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        private static bool IsIncluded(IntFilterCondition filterCondition, int? filter, string entryToCheck)
         {
             var included = true; // Until removed.  Negative logic is applied here.
 
             if (!int.TryParse(entryToCheck, out var intEntry) || !filter.HasValue)
             {
-                return included;
+                return true;
             }
 
             switch (filterCondition)
