@@ -121,7 +121,7 @@ public class RTFBuilder
         }
         else if (value.Contains('\n'))
         {
-            // Don't fail on non-Windows Environment.NewLine 
+            // Don't fail on non-Windows Environment.NewLine
             var lines = value.Split(["\n"], StringSplitOptions.None);
             foreach (var line in lines)
             {

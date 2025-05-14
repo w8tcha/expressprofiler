@@ -65,11 +65,10 @@ namespace PoorMansTSqlFormatterLib
 
                 if (replacementString != null)
                 {
-                    if (outBuilder == null)
-                        outBuilder = new StringBuilder(raw.Length);
+                    outBuilder ??= new StringBuilder(raw.Length);
 
                     if (latestReplacementPos < latestCheckPos)
-                        outBuilder.Append(raw.Substring(latestReplacementPos, latestCheckPos - latestReplacementPos));
+                        outBuilder.Append(raw[latestReplacementPos..latestCheckPos]);
 
                     outBuilder.Append(replacementString);
 
@@ -82,7 +81,7 @@ namespace PoorMansTSqlFormatterLib
             if (outBuilder != null)
             {
                 if (latestReplacementPos < latestCheckPos)
-                    outBuilder.Append(raw.Substring(latestReplacementPos));
+                    outBuilder.Append(raw[latestReplacementPos..]);
 
                 return outBuilder.ToString();
             }

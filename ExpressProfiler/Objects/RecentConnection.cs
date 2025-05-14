@@ -45,7 +45,7 @@ public class Connection
     [XmlElement(ElementName = "Password")]
     public string Password { get; set; }
     [XmlElement(ElementName = "UserId")]
-    public string UserId { get; set; }        
+    public string UserId { get; set; }
 }
 
 [XmlRoot(ElementName = "RecentConnection")]
@@ -72,7 +72,7 @@ public class RecentConnection
             return;
         }
 
-        if (this.Connections.Any(c => c.DataSource == connection.DataSource && c.UserId == connection.UserId))
+        if (this.Connections.Exists(c => c.DataSource == connection.DataSource && c.UserId == connection.UserId))
         {
             this.Connections.ForEach(c =>
                 {

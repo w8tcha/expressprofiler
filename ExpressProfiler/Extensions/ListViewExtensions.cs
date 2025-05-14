@@ -149,7 +149,7 @@ public static class ListViewExtensions
 
         private readonly IntPtr lParam;
 
-        // _WIN32_IE >= 0x0300 
+        // _WIN32_IE >= 0x0300
         private readonly int iImage;
 
         private readonly int iOrder;

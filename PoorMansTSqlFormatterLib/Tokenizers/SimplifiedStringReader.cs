@@ -20,15 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace PoorMansTSqlFormatterLib.Tokenizers
 {
-    internal class SimplifiedStringReader
+    internal class SimplifiedStringReader(string inputString)
     {
-        private char[] inputChars;
+        private readonly char[] inputChars = inputString.ToCharArray();
         private int nextCharIndex = 0;
-
-        public SimplifiedStringReader(string inputString)
-        {
-            this.inputChars = inputString.ToCharArray();
-        }
 
         internal int Read()
         {

@@ -97,10 +97,7 @@ public static class XmlHelper
     /// </param>
     public static void WriteXml(string folderPath, string fileName, string content)
     {
-        if (fileName == null)
-        {
-            throw new ArgumentNullException(nameof(fileName));
-        }
+        ArgumentNullException.ThrowIfNull(fileName);
 
         if (!Directory.Exists(folderPath))
         {

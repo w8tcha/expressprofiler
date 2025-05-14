@@ -53,7 +53,7 @@ public partial class TraceProperties : Form
             {
                 "like" or "eq" or "=" => StringFilterCondition.Like,
                 "notlike" => StringFilterCondition.NotLike,
-                _ => throw new Exception("Unknown filter condition:" + value)
+                _ => throw new Exception($"Unknown filter condition:{value}")
             };
     }
 
@@ -65,7 +65,7 @@ public partial class TraceProperties : Form
                 "notequal" or "ne" or "!=" or "<>" => IntFilterCondition.NotEqual,
                 "greaterthan" or "ge" or ">" => IntFilterCondition.GreaterThan,
                 "lessthan" or "le" or "<" => IntFilterCondition.LessThan,
-                _ => throw new Exception("Unknown filter condition:" + value)
+                _ => throw new Exception($"Unknown filter condition:{value}")
             };
     }
 

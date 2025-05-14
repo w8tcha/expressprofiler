@@ -1495,7 +1495,7 @@ public partial class MainForm : Form
     {
         var lvi = this.m_Cached[i];
         var evt = (ProfilerEvent)lvi.Tag;
-        var pattern = this.wholeWord ? "\\b" + this.LastPattern + "\\b" : this.LastPattern;
+        var pattern = this.wholeWord ? $"\\b{this.LastPattern}\\b" : this.LastPattern;
         if (!Regex.IsMatch(evt.TextData, pattern, this.matchCase ? RegexOptions.None : RegexOptions.IgnoreCase))
         {
             return false;
@@ -1688,7 +1688,7 @@ public partial class MainForm : Form
     private void About_Click(object sender, EventArgs e)
     {
         var aboutMsg = new StringBuilder();
-        aboutMsg.AppendLine(versionString + "\nhttps://github.com/w8tcha/expressprofiler");
+        aboutMsg.AppendLine($"{versionString}\nhttps://github.com/w8tcha/expressprofiler");
         aboutMsg.AppendLine();
         aboutMsg.AppendLine("Filter Icon Downloaded From:");
         aboutMsg.AppendLine(

@@ -32,7 +32,7 @@ namespace PoorMansTSqlFormatterLib
         }
 
         protected bool HtmlOutput { get; set; }
-        protected StringBuilder _outBuilder = new StringBuilder();
+        protected StringBuilder _outBuilder = new();
 
         public virtual void AddOutputContent(string content)
         {
@@ -44,7 +44,7 @@ namespace PoorMansTSqlFormatterLib
             if (HtmlOutput)
             {
                 if (!string.IsNullOrEmpty(htmlClassName))
-                    _outBuilder.Append(@"<span class=""" + htmlClassName + @""">");
+                    _outBuilder.Append($"""<span class="{htmlClassName}">""");
                 _outBuilder.Append(Utils.HtmlEncode(content));
                 if (!string.IsNullOrEmpty(htmlClassName))
                     _outBuilder.Append("</span>");
@@ -55,11 +55,10 @@ namespace PoorMansTSqlFormatterLib
 
         public virtual void OpenClass(string htmlClassName)
         {
-            if (htmlClassName == null)
-                throw new ArgumentNullException("htmlClassName");
+            ArgumentNullException.ThrowIfNull(htmlClassName);
 
             if (HtmlOutput)
-                _outBuilder.Append(@"<span class=""" + htmlClassName + @""">");
+                _outBuilder.Append($"""<span class="{htmlClassName}">""");
         }
 
         public virtual void CloseClass()
@@ -82,6 +81,5 @@ namespace PoorMansTSqlFormatterLib
         {
             return _outBuilder.ToString();
         }
-
     }
 }

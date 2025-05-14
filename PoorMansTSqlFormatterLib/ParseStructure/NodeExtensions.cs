@@ -32,8 +32,7 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
             if (value == null)
                 return null;
 
-            if (fromChild == null)
-                throw new ArgumentNullException("fromChild");
+            ArgumentNullException.ThrowIfNull(fromChild);
 
             var targetFound = false;
             Node sibling = null;
@@ -58,8 +57,7 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
             if (value == null)
                 return null;
 
-            if (fromChild == null)
-                throw new ArgumentNullException("fromChild");
+            ArgumentNullException.ThrowIfNull(fromChild);
 
             Node previousSibling = null;
 
@@ -195,7 +193,7 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
                     }
                 }
 
-                Node nextNode = null;
+                Node nextNode;
                 if (previousNode != null
                     && currentNode.Children.Any()
                     && !(currentNode.Equals(previousNode.Parent)))

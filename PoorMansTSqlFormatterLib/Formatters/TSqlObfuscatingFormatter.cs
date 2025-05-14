@@ -52,7 +52,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
         public bool RandomizeLineLength { get; set; }
         public bool PreserveComments { get; set; }
 
-        public bool HTMLFormatted { get { return RandomizeColor; } }
+        public bool HTMLFormatted => RandomizeColor;
 
         public IDictionary<string, string> KeywordMapping = new Dictionary<string, string>();
 
@@ -60,7 +60,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
 
         private const int MIN_CASE_WORD_LENGTH = 2;
         private const int MAX_CASE_WORD_LENGTH = 8;
-        private Random _randomizer = new Random();
+        private readonly Random _randomizer = new();
         private int _currentCaseLength = 0;
         private int _currentCaseLimit = MAX_CASE_WORD_LENGTH;
         private bool _currentlyUppercase = false;
@@ -74,7 +74,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
                 state.AddOutputContent(ErrorOutputPrefix);
 
             //pass "doc" itself into process: useful/necessary when formatting MINIFY sub-regions from standard formatter
-            ProcessSqlNodeList(new[] { sqlTreeDoc }, state);
+            ProcessSqlNodeList([sqlTreeDoc], state);
             state.BreakIfExpected();
             return state.DumpOutput();
         }
@@ -171,14 +171,14 @@ namespace PoorMansTSqlFormatterLib.Formatters
                     if (PreserveComments)
                     {
                         state.SpaceExpected = false;
-                        state.AddOutputContent("/*" + contentElement.TextValue + "*/");
+                        state.AddOutputContent($"/*{contentElement.TextValue}*/");
                     }
                     break;
                 case SqlStructureConstants.ENAME_COMMENT_SINGLELINE:
                     if (PreserveComments)
                     {
                         state.SpaceExpected = false;
-                        state.AddOutputContent("--" + contentElement.TextValue.Replace("\r", "").Replace("\n", ""));
+                        state.AddOutputContent($"--{contentElement.TextValue.Replace("\r", "").Replace("\n", "")}");
                         state.BreakExpected = true;
                     }
                     break;
@@ -187,7 +187,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
                     if (PreserveComments)
                     {
                         state.SpaceExpected = false;
-                        state.AddOutputContent("//" + contentElement.TextValue.Replace("\r", "").Replace("\n", ""));
+                        state.AddOutputContent($"//{contentElement.TextValue.Replace("\r", "").Replace("\n", "")}");
                         state.BreakExpected = true;
                     }
                     break;
@@ -202,23 +202,23 @@ namespace PoorMansTSqlFormatterLib.Formatters
                 case SqlStructureConstants.ENAME_STRING:
                     state.SpaceIfExpectedForAnsiString();
                     state.SpaceExpected = false;
-                    state.AddOutputContent("'" + contentElement.TextValue.Replace("'", "''") + "'");
+                    state.AddOutputContent($"'{contentElement.TextValue.Replace("'", "''")}'");
                     state.SpaceExpectedForAnsiString = true;
                     break;
 
                 case SqlStructureConstants.ENAME_NSTRING:
-                    state.AddOutputContent("N'" + contentElement.TextValue.Replace("'", "''") + "'");
+                    state.AddOutputContent($"N'{contentElement.TextValue.Replace("'", "''")}'");
                     state.SpaceExpectedForAnsiString = true;
                     break;
 
                 case SqlStructureConstants.ENAME_BRACKET_QUOTED_NAME:
                     state.SpaceExpected = false;
-                    state.AddOutputContent("[" + contentElement.TextValue.Replace("]", "]]") + "]");
+                    state.AddOutputContent($"[{contentElement.TextValue.Replace("]", "]]")}]");
                     break;
 
                 case SqlStructureConstants.ENAME_QUOTED_STRING:
                     state.SpaceExpected = false;
-                    state.AddOutputContent("\"" + contentElement.TextValue.Replace("\"", "\"\"") + "\"");
+                    state.AddOutputContent($"\"{contentElement.TextValue.Replace("\"", "\"\"")}\"");
                     break;
 
                 case SqlStructureConstants.ENAME_COMMA:
@@ -254,7 +254,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
 
                 case SqlStructureConstants.ENAME_NUMBER_VALUE:
                     state.AddOutputContent(FormatKeyword(contentElement.TextValue));
-                    if (!contentElement.TextValue.ToLowerInvariant().Contains("e"))
+                    if (!contentElement.TextValue.ToLowerInvariant().Contains('e'))
                     {
                         state.SpaceExpectedForE = true;
                         if (contentElement.TextValue.Equals("0"))
@@ -263,7 +263,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
                     break;
 
                 case SqlStructureConstants.ENAME_MONETARY_VALUE:
-                    if (!contentElement.TextValue.Substring(0, 1).Equals("$"))
+                    if (!contentElement.TextValue[..1].Equals("$"))
                         state.SpaceExpected = false;
 
                     state.AddOutputContent(contentElement.TextValue);
@@ -285,14 +285,10 @@ namespace PoorMansTSqlFormatterLib.Formatters
 
         private string FormatKeyword(string keyword)
         {
-            string outputKeyword;
-            if (!KeywordMapping.TryGetValue(keyword.ToUpperInvariant(), out outputKeyword))
+            if (!KeywordMapping.TryGetValue(keyword.ToUpperInvariant(), out var outputKeyword))
                 outputKeyword = keyword;
 
-            if (RandomizeCase)
-                return GetCaseRandomized(outputKeyword);
-            else
-                return outputKeyword;
+            return RandomizeCase ? GetCaseRandomized(outputKeyword) : outputKeyword;
         }
 
         private string GetCaseRandomized(string outputKeyword)
@@ -324,7 +320,8 @@ namespace PoorMansTSqlFormatterLib.Formatters
                 if (RandomizeColor)
                 {
                     _currentColorLimit = _randomizer.Next(MIN_COLOR_WORD_LENGTH, MAX_COLOR_WORD_LENGTH);
-                    _currentColor = string.Format("#{0:x2}{1:x2}{2:x2}", _randomizer.Next(0, 127), _randomizer.Next(0, 127), _randomizer.Next(0, 127));
+                    _currentColor =
+                        $"#{_randomizer.Next(0, 127):x2}{_randomizer.Next(0, 127):x2}{_randomizer.Next(0, 127):x2}";
                 }
                 if (RandomizeLineLength)
                 {
@@ -337,8 +334,8 @@ namespace PoorMansTSqlFormatterLib.Formatters
             private const int MIN_LINE_LENGTH = 10;
             private const int MAX_LINE_LENGTH = 80;
 
-            private bool RandomizeColor { get; set; }
-            private bool RandomizeLineLength { get; set; }
+            private bool RandomizeColor { get; }
+            private bool RandomizeLineLength { get; }
 
             internal bool BreakExpected { get; set; }
             internal bool SpaceExpectedForAnsiString { get; set; }
@@ -347,7 +344,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
             internal bool SpaceExpectedForPlusMinus { get; set; }
             internal bool SpaceExpected { get; set; }
 
-            private Random _randomizer = new Random();
+            private readonly Random _randomizer = new();
             private int _currentLineLength = 0;
             private int _thisLineLimit = MAX_LINE_LENGTH;
 
@@ -371,20 +368,22 @@ namespace PoorMansTSqlFormatterLib.Formatters
 
             public void SpaceIfExpectedForAnsiString()
             {
-                if (SpaceExpectedForAnsiString)
+                if (!SpaceExpectedForAnsiString)
                 {
-                    base.AddOutputContent(" ", null);
-                    SetSpaceNoLongerExpected();
+                    return;
                 }
+                base.AddOutputContent(" ", null);
+                SetSpaceNoLongerExpected();
             }
 
-            public void SpaceIfExpected()
+            private void SpaceIfExpected()
             {
-                if (SpaceExpected)
+                if (!SpaceExpected)
                 {
-                    base.AddOutputContent(" ", null);
-                    SetSpaceNoLongerExpected();
+                    return;
                 }
+                base.AddOutputContent(" ", null);
+                SetSpaceNoLongerExpected();
             }
 
             public override void AddOutputContent(string content, string htmlClassName)
@@ -399,10 +398,10 @@ namespace PoorMansTSqlFormatterLib.Formatters
                     BreakExpected = true;
                     BreakIfExpected();
                 }
-                else if ((SpaceExpectedForE && content.Substring(0, 1).ToLower().Equals("e"))
-                    || (SpaceExpectedForX && content.Substring(0, 1).ToLower().Equals("x"))
-                    || (SpaceExpectedForPlusMinus && content.Substring(0, 1).Equals("+"))
-                    || (SpaceExpectedForPlusMinus && content.Substring(0, 1).Equals("-"))
+                else if ((SpaceExpectedForE && content[..1].ToLower().Equals("e"))
+                    || (SpaceExpectedForX && content[..1].ToLower().Equals("x"))
+                    || (SpaceExpectedForPlusMinus && content[..1].Equals("+"))
+                    || (SpaceExpectedForPlusMinus && content[..1].Equals("-"))
                     )
                 {
                     SpaceExpected = true;
@@ -418,10 +417,11 @@ namespace PoorMansTSqlFormatterLib.Formatters
                         if (_currentColorLength == _currentColorLimit)
                         {
                             _currentColorLimit = _randomizer.Next(MIN_COLOR_WORD_LENGTH, MAX_COLOR_WORD_LENGTH);
-                            _currentColor = string.Format("#{0:x2}{1:x2}{2:x2}", _randomizer.Next(0, 127), _randomizer.Next(0, 127), _randomizer.Next(0, 127));
+                            _currentColor =
+                                $"#{_randomizer.Next(0, 127):x2}{_randomizer.Next(0, 127):x2}{_randomizer.Next(0, 127):x2}";
                             _currentColorLength = 0;
                         }
-                        
+
                         int writing;
                         if (content.Length - lengthWritten < _currentColorLimit - _currentColorLength)
                             writing = content.Length - lengthWritten;

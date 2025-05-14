@@ -471,7 +471,7 @@ public class YukonLexer
     {
         this.KeyHash(this.m_Run);
         return this.m_Tokens[
-            this.m_Line.Substring(this.m_TokenPos, this.m_Run + this.m_StringLen - this.m_TokenPos)];
+            this.m_Line[this.m_TokenPos..(this.m_Run + this.m_StringLen)]];
     }
 
     private void IdentProc()
@@ -563,7 +563,7 @@ public class YukonLexer
     {
         this.TokenId = TokenKind.tkSymbol;
         this.m_Run++;
-        if (this.GetChar(this.m_Run) == '=' || this.GetChar(this.m_Run) == '=')
+        if (this.GetChar(this.m_Run) == '=')
         {
             this.m_Run++;
         }
@@ -655,6 +655,6 @@ public class YukonLexer
                 break;
         }
 
-        this.Token = this.m_Line.Substring(this.m_TokenPos, this.m_Run - this.m_TokenPos);
+        this.Token = this.m_Line[this.m_TokenPos..this.m_Run];
     }
 }

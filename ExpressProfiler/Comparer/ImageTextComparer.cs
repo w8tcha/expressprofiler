@@ -67,7 +67,7 @@ public class ImageTextComparer : IComparer
         var image1 = listViewX.ImageIndex;
         var listViewY = (ListViewItem)y;
         var image2 = listViewY.ImageIndex;
-            
+
         if (image1 < image2)
         {
             return -1;

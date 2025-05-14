@@ -26,18 +26,12 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
 {
     internal class NodeImpl : Node
     {
-        public NodeImpl()
-        {
-            Attributes = new Dictionary<string, string>();
-            Children = new List<Node>();
-        }
-
         public string Name { get; set; }
         public string TextValue { get; set; }
         public Node Parent { get; set; }
 
-        public IDictionary<string, string> Attributes { get; private set; }
-        public IEnumerable<Node> Children { get; private set; }
+        public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string>();
+        public IEnumerable<Node> Children { get; } = [];
 
         public void AddChild(Node child)
         {
@@ -70,8 +64,7 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
 
         public string GetAttributeValue(string aName)
         {
-            string outVal = null;
-            Attributes.TryGetValue(aName, out outVal);
+            Attributes.TryGetValue(aName, out var outVal);
             return outVal;
         }
 

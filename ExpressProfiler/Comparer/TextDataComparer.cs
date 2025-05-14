@@ -32,32 +32,27 @@ using System.Collections.Generic;
 /// <summary>
 /// The text data comparer.
 /// </summary>
-public class TextDataComparer : IComparer<ListViewItem>
+/// <remarks>
+/// Initializes a new instance of the <see cref="TextDataComparer"/> class.
+/// </remarks>
+/// <param name="checkedColumn">
+/// The checked column.
+/// </param>
+/// <param name="sortOrder">
+/// The sort order.
+/// </param>
+public class TextDataComparer(int checkedColumn, SortOrder sortOrder) : IComparer<ListViewItem>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TextDataComparer"/> class.
-    /// </summary>
-    /// <param name="checkedColumn">
-    /// The checked column.
-    /// </param>
-    /// <param name="sortOrder">
-    /// The sort order.
-    /// </param>
-    public TextDataComparer(int checkedColumn, SortOrder sortOrder)
-    {
-        this.CheckedColumn = checkedColumn;
-        this.SortOrder = sortOrder;
-    }
-        
+
     /// <summary>
     /// Gets the checked column.
     /// </summary>
-    private int CheckedColumn { get; }
+    private int CheckedColumn { get; } = checkedColumn;
 
     /// <summary>
     /// Gets the sort order.
     /// </summary>
-    private SortOrder SortOrder { get; }
+    private SortOrder SortOrder { get; } = sortOrder;
 
     /// <summary>
     /// The compare.

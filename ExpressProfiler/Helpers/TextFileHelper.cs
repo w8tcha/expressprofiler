@@ -43,10 +43,7 @@ public static class TextFileHelper
     /// </returns>
     public static string ReadAllText(string fileName)
     {
-        if (fileName == null)
-        {
-            throw new ArgumentNullException(nameof(fileName));
-        }
+        ArgumentNullException.ThrowIfNull(fileName);
 
         using var reader = new StreamReader(fileName);
 

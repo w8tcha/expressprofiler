@@ -36,7 +36,7 @@ namespace PoorMansTSqlFormatterLib
     [ComVisible(true)]
     [ProgId("PoorMansTSqlFormatter.SqlFormattingManager")]
 #endif
-    public class SqlFormattingManager : _SqlFormattingManager
+    public class SqlFormattingManager(ISqlTokenizer tokenizer, ISqlTokenParser parser, ISqlTreeFormatter formatter) : _SqlFormattingManager
     {
         //default to built-in
         public SqlFormattingManager() : this(new Tokenizers.TSqlStandardTokenizer(), new Parsers.TSqlStandardParser(), new Formatters.TSqlStandardFormatter()) { }
@@ -44,16 +44,9 @@ namespace PoorMansTSqlFormatterLib
         //most common use-case, define only formatter
         public SqlFormattingManager(ISqlTreeFormatter formatter) : this(new Tokenizers.TSqlStandardTokenizer(), new Parsers.TSqlStandardParser(), formatter) { }
 
-        public SqlFormattingManager(ISqlTokenizer tokenizer, ISqlTokenParser parser, ISqlTreeFormatter formatter)
-        {
-            Tokenizer = tokenizer;
-            Parser = parser;
-            Formatter = formatter;
-        }
-
-        public ISqlTokenizer Tokenizer { get; set; }
-        public ISqlTokenParser Parser { get; set; }
-        public ISqlTreeFormatter Formatter { get; set; }
+        public ISqlTokenizer Tokenizer { get; set; } = tokenizer;
+        public ISqlTokenParser Parser { get; set; } = parser;
+        public ISqlTreeFormatter Formatter { get; set; } = formatter;
 
         public string Format(string inputSQL)
         {
@@ -79,7 +72,7 @@ namespace PoorMansTSqlFormatterLib
         }
     }
 
-    //This COM interface exists JUST so that we can use this class from VB6 - there is no need to expose 
+    //This COM interface exists JUST so that we can use this class from VB6 - there is no need to expose
     // these classes to COM in order for this library to be used in a .Net project.
 #if !SIMPLIFIEDFW
     [Guid("A7FD140A-C3C3-4233-95DB-A64B50C8DF2A")]

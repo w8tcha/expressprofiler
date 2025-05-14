@@ -69,6 +69,7 @@ public partial class RecentConnectionsForm : Form
     /// <summary>
     /// Gets a value indicating whether connection selected.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public bool ConnectionSelected { get; private set; }
 
     /// <summary>

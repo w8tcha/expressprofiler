@@ -37,14 +37,10 @@ namespace PoorMansTSqlFormatterLib
         private Node _currentContainer;
         internal Node CurrentContainer
         {
-            get
-            {
-                return _currentContainer;
-            }
+            get => _currentContainer;
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("CurrentContainer");
+                ArgumentNullException.ThrowIfNull(value);
 
                 if (!value.RootContainer().Equals(this))
                     throw new Exception("Current Container node can only be set to an element in the current document.");
@@ -53,32 +49,18 @@ namespace PoorMansTSqlFormatterLib
             }
         }
 
-        private bool _newStatementDue;
-        internal bool NewStatementDue
-        {
-            get
-            {
-                return _newStatementDue;
-            }
-            set
-            {
-                _newStatementDue = value;
-            }
-        }
+        internal bool NewStatementDue { get; set; }
 
         internal bool ErrorFound
         {
-            get
-            {
-                return _newStatementDue;
-            }
+            get => NewStatementDue;
             private set
             {
                 if (value)
                 {
                     this.SetAttribute(SqlStructureConstants.ANAME_ERRORFOUND, "1");
                 }
-                else 
+                else
                 {
                     this.RemoveAttribute(SqlStructureConstants.ANAME_ERRORFOUND);
                 }
@@ -210,18 +192,12 @@ namespace PoorMansTSqlFormatterLib
                         )
                     {
                         var currentSingleContainer = CurrentContainer.Parent.Parent;
-                        if (PathNameMatches(currentSingleContainer, 1, SqlStructureConstants.ENAME_ELSE_CLAUSE))
-                        {
-                            //we just ended the one and only statement in an else clause, and need to pop out to the same level as its parent if
-                            // singleContainer.else.if.CANDIDATE
-                            CurrentContainer = currentSingleContainer.Parent.Parent.Parent;
-                        }
-                        else
-                        {
+                        //we just ended the one and only statement in an else clause, and need to pop out to the same level as its parent if
+                        // singleContainer.else.if.CANDIDATE
+                        CurrentContainer = PathNameMatches(currentSingleContainer, 1, SqlStructureConstants.ENAME_ELSE_CLAUSE) ? currentSingleContainer.Parent.Parent.Parent :
                             //we just ended the one statement of an if or while, and need to pop out the same level as that if or while
                             // singleContainer.(if or while).CANDIDATE
-                            CurrentContainer = currentSingleContainer.Parent.Parent;
-                        }
+                            currentSingleContainer.Parent.Parent;
                     }
                     else
                     {

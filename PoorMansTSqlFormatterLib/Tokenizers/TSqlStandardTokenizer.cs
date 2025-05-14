@@ -28,12 +28,12 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
     {
         private class TokenizationState
         {
-            public TokenList TokenContainer { get; private set; } = [];
-            public SimplifiedStringReader InputReader { get; private set; } = null;
+            public TokenList TokenContainer { get; } = [];
+            public SimplifiedStringReader InputReader { get; } = null;
             public SqlTokenizationType? CurrentTokenizationType { get; set; } = null;
-            public StringBuilder CurrentTokenValue { get; set; } = new StringBuilder();
+            public StringBuilder CurrentTokenValue { get; } = new();
             public int CommentNesting { get; set; } = 0;
-            public int CurrentCharInt { get; set; } = -1;
+            private int CurrentCharInt { get; set; } = -1;
             public char CurrentChar
             {
                 get
@@ -47,13 +47,13 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                     return (char)CurrentCharInt;
                 }
             }
-            public long? RequestedMarkerPosition { get; private set; }
+            public long? RequestedMarkerPosition { get; }
             public bool HasUnprocessedCurrentCharacter { get; set; }
 
             public TokenizationState(string inputSQL, long? requestedMarkerPosition)
             {
                 if (requestedMarkerPosition > inputSQL.Length)
-                    throw new ArgumentException("Requested marker position cannot be beyond the end of the input string", "requestedMarkerPosition");
+                    throw new ArgumentException("Requested marker position cannot be beyond the end of the input string", nameof(requestedMarkerPosition));
 
                 InputReader = new SimplifiedStringReader(inputSQL);
                 RequestedMarkerPosition = requestedMarkerPosition;
@@ -130,7 +130,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                         break;
 
                     case SqlTokenizationType.SinglePeriod:
-                        if (state.CurrentChar >= '0' && state.CurrentChar <= '9')
+                        if (state.CurrentChar is >= '0' and <= '9')
                         {
                             state.CurrentTokenizationType = SqlTokenizationType.DecimalValue;
                             state.CurrentTokenValue.Append('.');
@@ -150,7 +150,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                             state.CurrentTokenValue.Append('0');
                             state.ConsumeCurrentCharacterIntoToken();
                         }
-                        else if (state.CurrentChar >= '0' && state.CurrentChar <= '9')
+                        else if (state.CurrentChar is >= '0' and <= '9')
                         {
                             state.CurrentTokenizationType = SqlTokenizationType.Number;
                             state.CurrentTokenValue.Append('0');
@@ -180,7 +180,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                             state.CurrentTokenizationType = SqlTokenizationType.DecimalValue;
                             state.ConsumeCurrentCharacterIntoToken();
                         }
-                        else if (state.CurrentChar >= '0' && state.CurrentChar <= '9')
+                        else if (state.CurrentChar is >= '0' and <= '9')
                         {
                             state.ConsumeCurrentCharacterIntoToken();
                         }
@@ -196,7 +196,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                             state.CurrentTokenizationType = SqlTokenizationType.FloatValue;
                             state.ConsumeCurrentCharacterIntoToken();
                         }
-                        else if (state.CurrentChar >= '0' && state.CurrentChar <= '9')
+                        else if (state.CurrentChar is >= '0' and <= '9')
                         {
                             state.ConsumeCurrentCharacterIntoToken();
                         }
@@ -207,11 +207,11 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                         break;
 
                     case SqlTokenizationType.FloatValue:
-                        if (state.CurrentChar >= '0' && state.CurrentChar <= '9')
+                        if (state.CurrentChar is >= '0' and <= '9')
                         {
                             state.ConsumeCurrentCharacterIntoToken();
                         }
-                        else if ((state.CurrentChar == '-' || state.CurrentChar == '+') && state.CurrentTokenValue.ToString().ToUpper().EndsWith("E"))
+                        else if (state.CurrentChar is '-' or '+' && state.CurrentTokenValue.ToString().ToUpper().EndsWith('E'))
                         {
                             state.ConsumeCurrentCharacterIntoToken();
                         }
@@ -222,9 +222,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                         break;
 
                     case SqlTokenizationType.BinaryValue:
-                        if ((state.CurrentChar >= '0' && state.CurrentChar <= '9')
-                            || (state.CurrentChar >= 'A' && state.CurrentChar <= 'F')
-                            || (state.CurrentChar >= 'a' && state.CurrentChar <= 'f')
+                        if (state.CurrentChar is >= '0' and <= '9' or >= 'A' and <= 'F' or >= 'a' and <= 'f'
                             )
                         {
                             state.ConsumeCurrentCharacterIntoToken();
@@ -238,8 +236,8 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                     case SqlTokenizationType.SingleDollar:
                         state.CurrentTokenValue.Append('$');
 
-                        if ((state.CurrentChar >= 'A' && state.CurrentChar <= 'Z')
-                            || (state.CurrentChar >= 'a' && state.CurrentChar <= 'z')
+                        if (state.CurrentChar is >= 'A' and <= 'Z'
+                            || state.CurrentChar is >= 'a' and <= 'z'
                             )
                             state.CurrentTokenizationType = SqlTokenizationType.PseudoName;
                         else
@@ -249,7 +247,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                         break;
 
                     case SqlTokenizationType.MonetaryValue:
-                        if (state.CurrentChar >= '0' && state.CurrentChar <= '9')
+                        if (state.CurrentChar is >= '0' and <= '9')
                         {
                             state.ConsumeCurrentCharacterIntoToken();
                         }
@@ -257,7 +255,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                         {
                             state.ConsumeCurrentCharacterIntoToken();
                         }
-                        else if (state.CurrentChar == '.' && !state.CurrentTokenValue.ToString().Contains("."))
+                        else if (state.CurrentChar == '.' && !state.CurrentTokenValue.ToString().Contains('.'))
                         {
                             state.ConsumeCurrentCharacterIntoToken();
                         }
@@ -653,7 +651,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
 
         private static bool IsCurrencyPrefix(char currentCharacter)
         {
-            //symbols that SQL Server recognizes as currency prefixes - these also happen to 
+            //symbols that SQL Server recognizes as currency prefixes - these also happen to
             // be word-breakers, except the dollar. Ref:
             // http://msdn.microsoft.com/en-us/library/ms188688.aspx
             return (currentCharacter == (char)0x0024
@@ -785,7 +783,7 @@ namespace PoorMansTSqlFormatterLib.Tokenizers
                 state.CurrentTokenizationType = SqlTokenizationType.SingleZero;
                 state.HasUnprocessedCurrentCharacter = false; //purposefully swallowing, will be reinserted later
             }
-            else if (state.CurrentChar >= '1' && state.CurrentChar <= '9')
+            else if (state.CurrentChar is >= '1' and <= '9')
             {
                 state.CurrentTokenizationType = SqlTokenizationType.Number;
                 state.ConsumeCurrentCharacterIntoToken();

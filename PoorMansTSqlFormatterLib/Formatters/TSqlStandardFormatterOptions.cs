@@ -50,15 +50,15 @@ namespace PoorMansTSqlFormatterLib.Formatters
 		}
 
         //Doesn't particularly need to be lazy-loaded, and doesn't need to be threadsafe.
-        private static readonly TSqlStandardFormatterOptions _defaultOptions = new TSqlStandardFormatterOptions();
+        private static readonly TSqlStandardFormatterOptions _defaultOptions = new();
 
         public TSqlStandardFormatterOptions(string serializedString) : this() {
 
-            if (string.IsNullOrEmpty(serializedString)) 
+            if (string.IsNullOrEmpty(serializedString))
                 return;
-                       
+
             //PLEASE NOTE: This is not reusable/general-purpose key-value serialization: it does not handle commas in data.
-            // This will need to be enhanced if we ever need to store formatter options that might contain equals signs or 
+            // This will need to be enhanced if we ever need to store formatter options that might contain equals signs or
 			// commas.
             foreach (var kvp in serializedString.Split(','))
             {
@@ -82,16 +82,16 @@ namespace PoorMansTSqlFormatterLib.Formatters
 				else if (key == "ExpandInLists") ExpandInLists = Convert.ToBoolean(value);
 				else if (key == "NewClauseLineBreaks") NewClauseLineBreaks = Convert.ToInt32(value);
 				else if (key == "NewStatementLineBreaks") NewStatementLineBreaks = Convert.ToInt32(value);
-				else throw new ArgumentException("Unknown option: " + key);
+				else throw new ArgumentException($"Unknown option: {key}");
             }
 
         }
 
 		//PLEASE NOTE: This is not reusable/general-purpose key-value serialization: it does not handle commas in data.
-		// This will need to be enhanced if we ever need to store formatter options that might contain equals signs or 
+		// This will need to be enhanced if we ever need to store formatter options that might contain equals signs or
 		// commas.
 		public string ToSerializedString()
-        { 
+        {
             var overrides = new Dictionary<string, string>();
 
             if (IndentString != _defaultOptions.IndentString) overrides.Add("IndentString", IndentString);
@@ -111,23 +111,17 @@ namespace PoorMansTSqlFormatterLib.Formatters
 			if (NewClauseLineBreaks != _defaultOptions.NewClauseLineBreaks) overrides.Add("NewClauseLineBreaks", NewClauseLineBreaks.ToString());
 			if (NewStatementLineBreaks != _defaultOptions.NewStatementLineBreaks) overrides.Add("NewStatementLineBreaks", NewStatementLineBreaks.ToString());
 			NewStatementLineBreaks = 2;
-    
+
             if (overrides.Count == 0) return string.Empty;
-            return string.Join(",", overrides.Select((kvp) => kvp.Key + "=" + kvp.Value).ToArray());
-           
+            return string.Join(",", overrides.Select((kvp) => $"{kvp.Key}={kvp.Value}").ToArray());
+
         }
 
         private string _indentString;
         public string IndentString
         {
-            get
-            {
-                return _indentString;
-            }
-            set
-            {
-                _indentString = value.Replace("\\t", "\t").Replace("\\s", " ");
-            }
+            get => _indentString;
+            set => _indentString = value.Replace("\\t", "\t").Replace("\\s", " ");
         }
 
         public int SpacesPerTab { get; set; }

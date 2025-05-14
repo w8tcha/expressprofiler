@@ -40,7 +40,7 @@ public class ListViewNF : ListView
         // Activate double buffering
         this.SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint, true);
 
-        // Enable the OnNotifyMessage event so we get a chance to filter out 
+        // Enable the OnNotifyMessage event so we get a chance to filter out
         // Windows messages before they get to the form's WndProc
         this.SetStyle(ControlStyles.EnableNotifyMessage, true);
 
@@ -50,6 +50,7 @@ public class ListViewNF : ListView
     /// <summary>
     /// Gets the sort order.
     /// </summary>
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
     public SortOrder SortOrder { get; private set; }
 
     /// <summary>

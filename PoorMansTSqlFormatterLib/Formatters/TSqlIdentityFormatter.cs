@@ -27,21 +27,16 @@ using PoorMansTSqlFormatterLib.Interfaces;
 namespace PoorMansTSqlFormatterLib.Formatters
 {
     /// <summary>
-    /// This formatter is intended to output *exactly the same content as initially parsed*, unless the 
+    /// This formatter is intended to output *exactly the same content as initially parsed*, unless the
     /// "HtmlColoring" option is enabled (then it should look the same in HTML, except for the coloring).
     /// </summary>
-    public class TSqlIdentityFormatter : ISqlTokenFormatter, ISqlTreeFormatter
+    public class TSqlIdentityFormatter(bool htmlColoring) : ISqlTokenFormatter, ISqlTreeFormatter
     {
         public TSqlIdentityFormatter() : this(false) { }
-        public TSqlIdentityFormatter(bool htmlColoring)
-        {
-            HTMLColoring = htmlColoring;
-            ErrorOutputPrefix = MessagingConstants.FormatErrorDefaultMessage + Environment.NewLine;
-        }
 
-        public bool HTMLColoring { get; set; }
-        public bool HTMLFormatted { get { return HTMLColoring; } }
-        public string ErrorOutputPrefix { get; set; }
+        public bool HTMLColoring { get; set; } = htmlColoring;
+        public bool HTMLFormatted => HTMLColoring;
+        public string ErrorOutputPrefix { get; set; } = MessagingConstants.FormatErrorDefaultMessage + Environment.NewLine;
 
         public string FormatSQLTree(Node sqlTreeDoc)
         {
@@ -51,7 +46,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
                 state.AddOutputContent(ErrorOutputPrefix);
 
             //pass "doc" itself into process: useful/necessary when formatting NOFORMAT sub-regions from standard formatter
-            ProcessSqlNodeList(new[] { sqlTreeDoc }, state);
+            ProcessSqlNodeList([sqlTreeDoc], state);
             return state.DumpOutput();
         }
 
@@ -140,25 +135,25 @@ namespace PoorMansTSqlFormatterLib.Formatters
                     break;
 
                 case SqlStructureConstants.ENAME_COMMENT_MULTILINE:
-                    state.AddOutputContent("/*" + contentElement.TextValue + "*/", SqlHtmlConstants.CLASS_COMMENT);
+                    state.AddOutputContent($"/*{contentElement.TextValue}*/", SqlHtmlConstants.CLASS_COMMENT);
                     break;
                 case SqlStructureConstants.ENAME_COMMENT_SINGLELINE:
-                    state.AddOutputContent("--" + contentElement.TextValue, SqlHtmlConstants.CLASS_COMMENT);
+                    state.AddOutputContent($"--{contentElement.TextValue}", SqlHtmlConstants.CLASS_COMMENT);
                     break;
                 case SqlStructureConstants.ENAME_COMMENT_SINGLELINE_CSTYLE:
-                    state.AddOutputContent("//" + contentElement.TextValue, SqlHtmlConstants.CLASS_COMMENT);
+                    state.AddOutputContent($"//{contentElement.TextValue}", SqlHtmlConstants.CLASS_COMMENT);
                     break;
                 case SqlStructureConstants.ENAME_STRING:
-                    state.AddOutputContent("'" + contentElement.TextValue.Replace("'", "''") + "'", SqlHtmlConstants.CLASS_STRING);
+                    state.AddOutputContent($"'{contentElement.TextValue.Replace("'", "''")}'", SqlHtmlConstants.CLASS_STRING);
                     break;
                 case SqlStructureConstants.ENAME_NSTRING:
-                    state.AddOutputContent("N'" + contentElement.TextValue.Replace("'", "''") + "'", SqlHtmlConstants.CLASS_STRING);
+                    state.AddOutputContent($"N'{contentElement.TextValue.Replace("'", "''")}'", SqlHtmlConstants.CLASS_STRING);
                     break;
                 case SqlStructureConstants.ENAME_QUOTED_STRING:
-                    state.AddOutputContent("\"" + contentElement.TextValue.Replace("\"", "\"\"") + "\"");
+                    state.AddOutputContent($"\"{contentElement.TextValue.Replace("\"", "\"\"")}\"");
                     break;
                 case SqlStructureConstants.ENAME_BRACKET_QUOTED_NAME:
-                    state.AddOutputContent("[" + contentElement.TextValue.Replace("]", "]]") + "]");
+                    state.AddOutputContent($"[{contentElement.TextValue.Replace("]", "]]")}]");
                     break;
 
                 case SqlStructureConstants.ENAME_COMMA:
