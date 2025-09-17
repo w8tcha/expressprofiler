@@ -1086,7 +1086,7 @@ public partial class MainForm : Form
             var lv = this.m_Cached[i];
             if (lv.SubItems[1].Text != string.Empty)
             {
-                sb.AppendFormat("{0}\r\ngo\r\n", lv.SubItems[1].Text.ParseSql());
+                sb.Append($"{lv.SubItems[1].Text.ParseSql()}\r\ngo\r\n");
             }
         }
 

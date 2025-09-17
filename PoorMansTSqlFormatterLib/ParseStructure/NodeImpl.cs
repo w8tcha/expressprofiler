@@ -20,8 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-
 namespace PoorMansTSqlFormatterLib.ParseStructure
 {
     internal class NodeImpl : Node
@@ -36,7 +34,8 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
         public void AddChild(Node child)
         {
             SetParentOnChild(child);
-            ((IList<Node>)Children).Add(child);
+            var childList = Children as IList<Node>;
+            childList.Add(child);
         }
 
         public void InsertChildBefore(Node newChild, Node existingChild)

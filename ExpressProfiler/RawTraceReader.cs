@@ -505,7 +505,7 @@ public class RawTraceReader
         var sb = new StringBuilder();
         foreach (var i in columns)
         {
-            sb.AppendFormat("\r\n exec sp_trace_setevent {0}, {1}, {2}, @on", traceid, eventId, i);
+            sb.Append($"\r\n exec sp_trace_setevent {traceid}, {eventId}, {i}, @on");
         }
 
         return sb.ToString();

@@ -209,12 +209,12 @@ public class RTFBuilder
         result.Append("{\\colortbl ;");
         foreach (var item in this.m_Colortable)
         {
-            result.AppendFormat("\\red{0}\\green{1}\\blue{2};", item.R, item.G, item.B);
+            result.Append($"\\red{item.R}\\green{item.G}\\blue{item.B};");
         }
 
         result.AppendLine("}");
         result.Append("\\viewkind4\\uc1\\pard\\plain\\f0");
-        result.AppendFormat("\\fs{0} ", this.m_DefaultFontSize);
+        result.Append($"\\fs{this.m_DefaultFontSize} ");
         result.AppendLine();
         result.Append(this.m_Sb);
         result.Append('}');
