@@ -26,7 +26,7 @@ using PoorMansTSqlFormatterLib.ParseStructure;
 
 namespace PoorMansTSqlFormatterLib
 {
-    internal class ParseTree : NodeImpl, Node
+    internal class ParseTree : NodeImpl
     {
         public ParseTree(string rootName) : base()
         {

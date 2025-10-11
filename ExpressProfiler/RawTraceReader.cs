@@ -28,7 +28,7 @@
 namespace ExpressProfiler;
 
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 // ReSharper restore UnusedMember.Global
 // ReSharper restore InconsistentNaming

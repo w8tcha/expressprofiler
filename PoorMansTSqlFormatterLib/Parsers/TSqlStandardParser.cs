@@ -322,12 +322,9 @@ namespace PoorMansTSqlFormatterLib.Parsers
                         {
                             if (sqlTree.PathNameMatches(0, SqlStructureConstants.ENAME_DDL_PROCEDURAL_BLOCK))
                             {
-                                var isDataTypeDefinition = false;
-                                if (significantTokenPositions.Count > 1
-                                    && KeywordList.TryGetValue(tokenList[significantTokenPositions[1]].Value.ToUpperInvariant(), out var nextKeywordType)
-                                    )
-                                    if (nextKeywordType == KeywordType.DataTypeKeyword)
-                                        isDataTypeDefinition = true;
+                                var isDataTypeDefinition = significantTokenPositions.Count > 1
+                                                           && KeywordList.TryGetValue(tokenList[significantTokenPositions[1]].Value.ToUpperInvariant(), out var nextKeywordType)
+                                                           && nextKeywordType == KeywordType.DataTypeKeyword;
 
                                 if (isDataTypeDefinition)
                                 {
@@ -342,9 +339,9 @@ namespace PoorMansTSqlFormatterLib.Parsers
                                 }
                             }
                             else if (sqlTree.PathNameMatches(0, SqlStructureConstants.ENAME_CONTAINER_GENERALCONTENT)
-                                && sqlTree.PathNameMatches(1, SqlStructureConstants.ENAME_DDL_WITH_CLAUSE)
-                                && sqlTree.PathNameMatches(2, SqlStructureConstants.ENAME_DDL_PROCEDURAL_BLOCK)
-                                )
+                                     && sqlTree.PathNameMatches(1, SqlStructureConstants.ENAME_DDL_WITH_CLAUSE)
+                                     && sqlTree.PathNameMatches(2, SqlStructureConstants.ENAME_DDL_PROCEDURAL_BLOCK)
+                                    )
                             {
                                 sqlTree.MoveToAncestorContainer(2, SqlStructureConstants.ENAME_DDL_PROCEDURAL_BLOCK);
                                 sqlTree.StartNewContainer(SqlStructureConstants.ENAME_DDL_AS_BLOCK, token.Value, SqlStructureConstants.ENAME_CONTAINER_GENERALCONTENT);
@@ -1164,7 +1161,7 @@ namespace PoorMansTSqlFormatterLib.Parsers
                         //create in statement rather than clause if there are no siblings yet
                         if (sqlTree.PathNameMatches(0, SqlStructureConstants.ENAME_SQL_CLAUSE)
                             && sqlTree.PathNameMatches(1, SqlStructureConstants.ENAME_SQL_STATEMENT)
-                            && !sqlTree.CurrentContainer.Children.Any()
+                            && sqlTree.CurrentContainer.Children.Count == 0
                             )
                             sqlTree.SaveNewElementAsPriorSibling(GetEquivalentSqlNodeName(token.Type), token.Value, sqlTree.CurrentContainer);
                         else

@@ -965,13 +965,10 @@ namespace PoorMansTSqlFormatterLib.Formatters
             {
                 string keywordFound = null;
                 int? keywordFoundAt = null;
-                foreach (var key in _mostRecentKeywordsAtEachLevel.Keys)
+                foreach (var key in _mostRecentKeywordsAtEachLevel.Keys.Where(key => (keywordFoundAt == null || keywordFoundAt.Value > key) && key >= IndentLevel))
                 {
-                    if ((keywordFoundAt == null || keywordFoundAt.Value > key) && key >= IndentLevel)
-                    {
-                        keywordFoundAt = key;
-                        keywordFound = _mostRecentKeywordsAtEachLevel[key];
-                    }
+                    keywordFoundAt = key;
+                    keywordFound = _mostRecentKeywordsAtEachLevel[key];
                 }
                 return keywordFound;
             }
@@ -979,9 +976,7 @@ namespace PoorMansTSqlFormatterLib.Formatters
             public void ResetKeywords()
             {
                 List<int> descendentLevelKeys = [];
-                foreach (var key in _mostRecentKeywordsAtEachLevel.Keys)
-                    if (key >= IndentLevel)
-                        descendentLevelKeys.Add(key);
+                descendentLevelKeys.AddRange(_mostRecentKeywordsAtEachLevel.Keys.Where(key => key >= IndentLevel));
                 foreach (var key in descendentLevelKeys)
                     _mostRecentKeywordsAtEachLevel.Remove(key);
             }

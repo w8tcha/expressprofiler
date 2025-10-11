@@ -29,7 +29,7 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
         public Node Parent { get; set; }
 
         public IDictionary<string, string> Attributes { get; } = new Dictionary<string, string>();
-        public IEnumerable<Node> Children { get; } = [];
+        public ICollection<Node> Children { get; } = [];
 
         public void AddChild(Node child)
         {

@@ -28,7 +28,7 @@
 namespace ExpressProfiler;
 
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Windows.Forms;
 
 public partial class MainForm : Form
@@ -1392,32 +1392,6 @@ public partial class MainForm : Form
         }
     }
 
-    // internal void PerformFind(bool forwards)
-    // {
-    // if(String.IsNullOrEmpty(lastpattern)) return;
-
-    // if (forwards)
-    // {
-    // for (int i = lastpos = lvEvents.Items.IndexOf(lvEvents.FocusedItem) + 1; i < m_Cached.Count; i++)
-    // {
-    // if (FindText(i))
-    // {
-    // return;
-    // }
-    // }
-    // }
-    // else
-    // {
-    // for (int i = lastpos = lvEvents.Items.IndexOf(lvEvents.FocusedItem) - 1; i > 0; i--)
-    // {
-    // if (FindText(i))
-    // {
-    // return;
-    // }
-    // }
-    // }
-    // MessageBox.Show(String.Format("Failed to find \"{0}\". Searched to the end of data. ", lastpattern), "ExpressProfiler", MessageBoxButtons.OK, MessageBoxIcon.Information);
-    // }
     internal void PerformFind(bool forwards, bool wrapAround)
     {
         if (string.IsNullOrEmpty(this.LastPattern))

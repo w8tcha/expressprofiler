@@ -31,7 +31,7 @@ namespace PoorMansTSqlFormatterLib.ParseStructure
         string GetAttributeValue(string name);
         void RemoveAttribute(string name);
         Node Parent { get; }
-        IEnumerable<Node> Children { get; }
+        ICollection<Node> Children { get; }
         void AddChild(Node child);
         void InsertChildBefore(Node newChild, Node existingChild);
         void RemoveChild(Node childThing);
