@@ -184,10 +184,10 @@ public partial class MainForm : Form
     // HostName = Filters.HostName,
     // TextData = Filters.TextData,
     // ApplicationName = Filters.ApplicationName,
-    private bool ParseFilterParam(IReadOnlyList<string> args, int idx)
+    private bool ParseFilterParam(string[] args, int idx)
     {
-        var condition = idx + 1 < args.Count ? args[idx + 1] : string.Empty;
-        var value = idx + 2 < args.Count ? args[idx + 2] : string.Empty;
+        var condition = idx + 1 < args.Length ? args[idx + 1] : string.Empty;
+        var value = idx + 2 < args.Length ? args[idx + 2] : string.Empty;
 
         switch (args[idx].ToLower())
         {
@@ -669,8 +669,8 @@ public partial class MainForm : Form
         return new SqlConnection
                    {
                        ConnectionString = this.tbAuth.SelectedIndex == 0
-                                              ? $@"Data Source = {this.edServer.Text}; Initial Catalog = master; Integrated Security=SSPI;Application Name=Express Profiler"
-                                              : $@"Data Source={this.edServer.Text};Initial Catalog=master;User Id={this.edUser.Text};Password='{this.edPassword.Text}';;Application Name=Express Profiler"
+                                              ? $@"Data Source = {this.edServer.Text}; Initial Catalog = master; Integrated Security=SSPI;Application Name=Express Profiler;TrustServerCertificate=True"
+                                              : $@"Data Source={this.edServer.Text};Initial Catalog=master;User Id={this.edUser.Text};Password='{this.edPassword.Text}';;Application Name=Express Profiler;TrustServerCertificate=True"
                    };
     }
 
@@ -1255,7 +1255,7 @@ public partial class MainForm : Form
         this.ClearTrace();
     }
 
-    private static void NewAttribute(XmlNode node, string name, string value)
+    private static void NewAttribute(XmlElement node, string name, string value)
     {
         var attr = node.OwnerDocument.CreateAttribute(name);
         attr.Value = value;
@@ -1312,7 +1312,7 @@ public partial class MainForm : Form
 
     private static void CreateEventRow(ProfilerEvent evt, XmlNode root)
     {
-        XmlNode row = root.OwnerDocument.CreateElement("event");
+        var row = root.OwnerDocument.CreateElement("event");
         NewAttribute(row, "EventClass", evt.EventClass.ToString(CultureInfo.InvariantCulture));
         NewAttribute(row, "CPU", evt.CPU.ToString(CultureInfo.InvariantCulture));
         NewAttribute(row, "Reads", evt.Reads.ToString(CultureInfo.InvariantCulture));
@@ -1584,7 +1584,7 @@ public partial class MainForm : Form
         lock (this.m_Cached)
         {
             long rowNumber = 1;
-            foreach (var lvi in this.m_Cached)
+            foreach (var tag in this.m_Cached.Select(lvi => lvi.Tag))
             {
                 row = doc.CreateElement("ss", "Row", urn);
                 table.AppendChild(row);
@@ -1610,14 +1610,14 @@ public partial class MainForm : Form
                         NewAttribute(data, "Type", dataType, urn);
                         if (ProfilerEventColumns.EventClass == pc.Column)
                         {
-                            data.InnerText = this.GetEventCaption((ProfilerEvent)lvi.Tag);
+                            data.InnerText = this.GetEventCaption((ProfilerEvent)tag);
                         }
                         else
                         {
                             data.InnerText = pc.Column == -1
                                                  ? string.Empty
                                                  : GetFormattedValue(
-                                                       (ProfilerEvent)lvi.Tag,
+                                                       (ProfilerEvent)tag,
                                                        pc.Column,
                                                        ProfilerEventColumns.ProfilerColumnDataTypes[pc.Column] ==
                                                        ProfilerColumnDataType.DateTime
@@ -1784,7 +1784,7 @@ public partial class MainForm : Form
         lock (this.m_Cached)
         {
             long rowNumber = 1;
-            foreach (var lvi in this.m_Cached)
+            foreach (var tag in this.m_Cached.Select(lvi => lvi.Tag))
             {
                 row = doc.CreateElement("ss", "Row", urn);
                 table.AppendChild(row);
@@ -1799,7 +1799,6 @@ public partial class MainForm : Form
                         var dataType = ProfilerEventColumns.ProfilerColumnDataTypes[pc.Column] switch
                             {
                                 ProfilerColumnDataType.Int or ProfilerColumnDataType.Long => "Number",
-                                ProfilerColumnDataType.DateTime => "String",
                                 _ => "String"
                             };
                         if (ProfilerEventColumns.EventClass == pc.Column)
@@ -1810,14 +1809,14 @@ public partial class MainForm : Form
                         NewAttribute(data, "Type", dataType, urn);
                         if (ProfilerEventColumns.EventClass == pc.Column)
                         {
-                            data.InnerText = this.GetEventCaption((ProfilerEvent)lvi.Tag);
+                            data.InnerText = this.GetEventCaption((ProfilerEvent)tag);
                         }
                         else
                         {
                             data.InnerText = pc.Column == -1
                                                  ? string.Empty
                                                  : GetFormattedValue(
-                                                       (ProfilerEvent)lvi.Tag,
+                                                       (ProfilerEvent)tag,
                                                        pc.Column,
                                                        ProfilerEventColumns.ProfilerColumnDataTypes[pc.Column] ==
                                                        ProfilerColumnDataType.DateTime
@@ -1830,7 +1829,7 @@ public partial class MainForm : Form
                         // The export of the sequence number '#' is handled here.
                         var cell = doc.CreateElement("ss", "Cell", urn);
                         row.AppendChild(cell);
-                        XmlNode data = doc.CreateElement("ss", "Data", urn);
+                        var data = doc.CreateElement("ss", "Data", urn);
                         cell.AppendChild(data);
                         const string dataType = "Number";
                         NewAttribute(data, "Type", dataType, urn);

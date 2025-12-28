@@ -481,19 +481,19 @@ public class RawTraceReader
         evt.m_ColumnMask |= 1UL << columnid;
     }
 
-    private static long ToInt64(IReadOnlyList<byte> value)
+    private static long ToInt64(byte[] value)
     {
         var i1 = value[0] | (value[1] << 8) | (value[2] << 16) | (value[3] << 24);
         var i2 = value[4] | (value[5] << 8) | (value[6] << 16) | (value[7] << 24);
         return (uint)i1 | ((long)i2 << 32);
     }
 
-    private static int ToInt32(IReadOnlyList<byte> value)
+    private static int ToInt32(byte[] value)
     {
         return value[0] | (value[1] << 8) | (value[2] << 16) | (value[3] << 24);
     }
 
-    private static int ToInt16(IReadOnlyList<byte> value)
+    private static int ToInt16(byte[] value)
     {
         return value[0] | (value[1] << 8);
     }

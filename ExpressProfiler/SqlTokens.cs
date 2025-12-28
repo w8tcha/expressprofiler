@@ -149,7 +149,7 @@ internal class SqlTokens
         get
         {
             token = token.ToLower();
-            return this.m_Words.TryGetValue(token, out var word) ? word : YukonLexer.TokenKind.tkUnknown;
+            return this.m_Words.GetValueOrDefault(token, YukonLexer.TokenKind.tkUnknown);
         }
     }
 

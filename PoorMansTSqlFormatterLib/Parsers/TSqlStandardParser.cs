@@ -530,17 +530,15 @@ namespace PoorMansTSqlFormatterLib.Parsers
                         else if (significantTokensString.StartsWith("OUTPUT "))
                         {
                             bool isSprocArgument = sqlTree.PathNameMatches(0, SqlStructureConstants.ENAME_SQL_CLAUSE)
-                                                   && sqlTree.PathNameMatches(1, SqlStructureConstants.ENAME_SQL_STATEMENT)
-                                                   && (ContentStartsWithKeyword(sqlTree.CurrentContainer, "EXEC")
-                                                       || ContentStartsWithKeyword(sqlTree.CurrentContainer, "EXECUTE")
-                                                       || ContentStartsWithKeyword(sqlTree.CurrentContainer, null)
-                                                   );
+                                && sqlTree.PathNameMatches(1, SqlStructureConstants.ENAME_SQL_STATEMENT)
+                                && (ContentStartsWithKeyword(sqlTree.CurrentContainer, "EXEC")
+                                    || ContentStartsWithKeyword(sqlTree.CurrentContainer, "EXECUTE")
+                                    || ContentStartsWithKeyword(sqlTree.CurrentContainer, null)
+                                ) || sqlTree.PathNameMatches(0, SqlStructureConstants.ENAME_DDL_PROCEDURAL_BLOCK);
 
                             //We're looking for sproc calls - they can't be nested inside anything else (as far as I know)
 
                             //Also proc definitions - argument lists without parens
-                            if (sqlTree.PathNameMatches(0, SqlStructureConstants.ENAME_DDL_PROCEDURAL_BLOCK))
-                                isSprocArgument = true;
 
                             if (!isSprocArgument)
                             {
